@@ -1,5 +1,5 @@
-A spring.io JPA Rest service that is configured to run under Spring Boot with embedded Tomcat for a service container. The service is configured by default to use a HSQLDB database named "nomdb" and will create itself on startup if needed. It is configured to deploy on port 7293. These values can be changed by modifying the application.properties file. 
-The maven build script will create an executable jar named "java -jar nominationService-{version}.jar in the /target directory. To start the service, issue the following command:
+This is a spring.io JPA Rest service that is configured to run under Spring Boot with embedded Tomcat for a service container. The service is configured by default to use an HSQLDB database named "nomdb" and will create itself on startup if needed. It is configured to deploy on port 7293. These values can be changed by modifying the application.properties file. 
+The maven build script will create an executable jar named "nominationService-{version}.jar" in the /target directory. To start the service, issue the following command:
 java -jar nominationService-0.1.0.jar
 
 
@@ -30,7 +30,7 @@ Nominations have the following structure on output:
 }
 
 
-The careplan id is an arbitrary string. The nominationType can be any arbitrary string, but the careplan serialization will only include nominations of the following types:"conditions”,”diagnostic-orders”, ”goals”, "medication-orders”, and “procedure-requests”. The contents of “existing”, “proposed”, and “diff” are configured to have a 64k limit in length. Modifying these values requires recompilation. 
+The careplan id is an arbitrary string. The nominationType can be any arbitrary string, but the careplan serialization will only include nominations of the following types:"conditions", "diagnostic-orders", "goals", "medication-orders", and "procedure-requests". The contents of "existing", "proposed", and "diff" are configured to have a 64k limit in length. Modifying these values requires recompilation. 
 
 The nomination object takes arbitrary JSON objects for the values of the proposed and existing attributes. When both objects are set during insertion, an RFC 6902 (https://tools.ietf.org/html/rfc6902) diff is generated and inserted into the diff attribute. 
 
@@ -82,6 +82,4 @@ Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
 Date: Thu, 17 Dec 2015 03:20:54 GMT
 
-{"id":"17","conditions":[],"diagnosticOrders":[],"goals":[],"medicationOrders":[],"procedureRequests":[{"id":18,"careplan":"17","action":"update","nominationFor":"procedure-request","existing":{"prop":"value2","prop2":1},"proposed":{},"diff":[{"op":"remove","path":"/prop"},{"op":"remove","path":"/prop2"}]}]}
-
-
+{"id":"17","conditions":[],"diagnosticOrders":[],"goals":[],"medicationOrders":[],"procedureRequests":[{"id":18,"careplan":"17","action":"update","existing":{"prop":"value2","prop2":1},"proposed":{},"diff":[{"op":"remove","path":"/prop"},{"op":"remove","path":"/prop2"}]}]}
