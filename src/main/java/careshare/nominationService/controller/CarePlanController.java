@@ -1,22 +1,22 @@
 package careshare.nominationService.controller;
 
-import careshare.nominationService.model.CarePlan;
-import careshare.nominationService.model.Condition;
-import careshare.nominationService.model.DiagnosticOrder;
-import careshare.nominationService.model.Goal;
-import careshare.nominationService.model.MedicationOrder;
-import careshare.nominationService.model.ProcedureRequest;
-import careshare.nominationService.repo.MedicationOrderRepo;
-import java.util.ArrayList;
+import careshare.nominationService.model.ORCarePlan;
+import careshare.nominationService.model.OneRing;
+import careshare.nominationService.repo.OneRingRepo;
 import java.util.Collection;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -25,75 +25,115 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
  * @author kcrouch
  */
 @RestController
-@RequestMapping("/careplan/{careplan}")
+@RequestMapping("/careplan")
 class CarePlanController {
 
-  private final MedicationOrderRepo medOrderRepo;
+  private final OneRingRepo oneRingRepo;
+
+  private static final String NF_CONDITION = "condition";
+  private static final String NF_DIAG_ORDER = "diagnostic-order";
+  private static final String NF_GOAL = "goal";
+  private static final String NF_MED_ORDER = "medication-order";
+  private static final String NF_PROC_REQUEST = "procedure-request";
 
   @Autowired
-  CarePlanController(MedicationOrderRepo mor) {
-	this.medOrderRepo = mor;
+  CarePlanController(OneRingRepo orr) {
+	this.oneRingRepo = orr;
   }
 
-  @RequestMapping(method = RequestMethod.GET)
-  CarePlan generateCareplan(@PathVariable String careplan) {
-	Collection<Condition> conditions = new ArrayList<>();
-	Collection<DiagnosticOrder> diagnosticOrders = new ArrayList<>();
-	Collection<Goal> goals = new ArrayList<>();
-	Collection<MedicationOrder> medOrders = this.medOrderRepo.findByCareplan(careplan);
-	Collection<ProcedureRequest> procedureRequests = new ArrayList<>();
-	
-	CarePlan plan = new CarePlan(careplan, conditions, diagnosticOrders,
-	goals, medOrders, procedureRequests);
-//	CarePlan plan = new CarePlan(careplan, medOrders, null, null);
+  @RequestMapping(value = "/{careplan}", method = RequestMethod.GET)
+  ORCarePlan generateCareplan(@PathVariable String careplan) {
+	Collection<OneRing> conditions = oneRingRepo.findByCareplanAndNominationFor(careplan, NF_CONDITION);
+	Collection<OneRing> diagnosticOrders = oneRingRepo.findByCareplanAndNominationFor(careplan, NF_DIAG_ORDER);
+	Collection<OneRing> goals = oneRingRepo.findByCareplanAndNominationFor(careplan, NF_GOAL);
+	Collection<OneRing> medOrders = oneRingRepo.findByCareplanAndNominationFor(careplan, NF_MED_ORDER);
+	Collection<OneRing> procedureRequests = oneRingRepo.findByCareplanAndNominationFor(careplan, NF_PROC_REQUEST);
+
+	ORCarePlan plan = new ORCarePlan(careplan, conditions, diagnosticOrders,
+			goals, medOrders, procedureRequests);
 	return plan;
   }
-  
-  
+
+  @RequestMapping("/{careplan}/{nomFor}")
+  Collection<OneRing> gatherNoms(@PathVariable String careplan, @PathVariable String nomFor) {
+	nomFor = lessEs(nomFor);
+	Collection<OneRing> rings = oneRingRepo.findByCareplanAndNominationFor(careplan, nomFor);
+	return rings;
+  }
+
+  @RequestMapping(value = "/{careplan}/{nomFor}", method = RequestMethod.PUT)
+  ResponseEntity<?> add(@PathVariable String careplan, @PathVariable String nomFor, @RequestBody OneRing input) {
+	nomFor = lessEs(nomFor);
+	
+	OneRing res = new OneRing(careplan, input.getAction(), nomFor,
+			input.getExisting(), input.getProposed(), input.getDiff());
+	res = oneRingRepo.save(res);
+
+	HttpHeaders httpHeaders = new HttpHeaders();
+	httpHeaders.setLocation(ServletUriComponentsBuilder
+			.fromCurrentRequest().path("/{id}")
+			.buildAndExpand(res.getId()).toUri());
+	return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
+  }
+
+  @RequestMapping(value = "/{careplan}/{nomFor}/{nomId}", method = RequestMethod.GET)
+  OneRing readOneRing(@PathVariable String careplan, @PathVariable String nomFor, @PathVariable Long nomId) {
+	nomFor = lessEs(nomFor);
+
+	OneRing ring = oneRingRepo.findByCareplanAndNominationForAndId(careplan, nomFor, nomId);
+	if (ring == null) {
+	  throw new ItemNotFoundException();
+	} else {
+	  return ring;
+	}
+  }
+
+  @RequestMapping(value = "/{careplan}/{nomFor}/{nomId}",
+		  method = RequestMethod.DELETE)
+  void deleteNomination(@PathVariable String careplan, @PathVariable String nomFor,
+		  @PathVariable Long nomId) {
+	nomFor = lessEs(nomFor);
+
+	OneRing ring = oneRingRepo.findByCareplanAndNominationForAndId(careplan, nomFor, nomId);
+
+	if (ring != null) {
+	  oneRingRepo.delete(ring);
+	} else {
+	  throw new ItemNotFoundException();
+	}
+  }
+
+  private String lessEs(String nomFor) {
+	if (nomFor.endsWith("s")) {
+	  return nomFor.substring(0, nomFor.length() - 1);
+	} else {
+	  return nomFor;
+	}
+  }
+
 }
 
-@RestController
-@RequestMapping("/careplan/{careplan}/medication-orders")
-class MedicationOrderController {
+class ItemNotFoundException extends RuntimeException {
 
-	private final MedicationOrderRepo medOrderRepo;
+}
 
+class MalformedRequestException extends RuntimeException {
 
-	@RequestMapping(method = RequestMethod.POST)
-	ResponseEntity<?> add(@PathVariable String careplan, @RequestBody MedicationOrder input) {
-		MedicationOrder result = 
-				medOrderRepo.save(new MedicationOrder(input.getCareplan(),
-				input.getAction(), input.getExisting(), input.getProposed(),
-				input.getDiff()));
+}
 
-					HttpHeaders httpHeaders = new HttpHeaders();
-					httpHeaders.setLocation(ServletUriComponentsBuilder
-							.fromCurrentRequest().path("/{id}")
-							.buildAndExpand(result.getId()).toUri());
-					return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
-  	}
+@ControllerAdvice
+class RestExceptionProcessor {
 
-	@RequestMapping(value = "/{nomId}", method = RequestMethod.GET)
-	MedicationOrder readMedOrder(@PathVariable String careplan, @PathVariable Long nomId) {
-		return this.medOrderRepo.findOne(nomId);
-	}
-	
-	@RequestMapping(value="/{nomId}", method = RequestMethod.DELETE)
-	void deleteNomination(@PathVariable Long nomId) {
-	  MedicationOrder mo = this.medOrderRepo.findOne(nomId);
-	  if(mo != null)
-		this.medOrderRepo.delete(mo);
-	}
+  @ExceptionHandler(ItemNotFoundException.class)
+  @ResponseStatus(value = HttpStatus.NOT_FOUND)
+  @ResponseBody
+  public void itemNotFound(HttpServletRequest req, ItemNotFoundException ex) {
+  }
 
-	@RequestMapping(method = RequestMethod.GET)
-	Collection<MedicationOrder> readMedOrders(@PathVariable String careplan) {
-		return this.medOrderRepo.findByCareplan(careplan);
-	}
-	
-
-	@Autowired
-	MedicationOrderController(MedicationOrderRepo mor) {
-		this.medOrderRepo = mor;
-	}
+  @ExceptionHandler(MalformedRequestException.class)
+  @ResponseStatus(value = HttpStatus.BAD_GATEWAY)
+  @ResponseBody
+  public void itemNotFound(HttpServletRequest req, MalformedRequestException ex) {
+  }
 
 }

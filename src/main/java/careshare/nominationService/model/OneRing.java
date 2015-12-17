@@ -1,37 +1,44 @@
-
 package careshare.nominationService.model;
 
-import careshare.nominationService.utils.MedicationOrderDS;
+import careshare.nominationService.utils.OneRingDeserializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+
 /**
  *
  * @author kcrouch
  */
 
 @Entity
-@JsonDeserialize(using = MedicationOrderDS.class)
-public class MedicationOrder implements Serializable, BaseDeserializable {
-  
+@JsonDeserialize(using = OneRingDeserializer.class)
+public class OneRing implements Serializable {
+
   @Id
   @GeneratedValue
   private Long id;
-  
-  
+
   private String careplan;
   private String action;
   
-  @JsonRawValue  
+  @JsonIgnore
+  private String nominationFor;
+
+  @JsonRawValue
+  @Column(length=65536)  
   private String existing;
-  
+
   @JsonRawValue
+  @Column(length=65536)  
   private String proposed;
-  
+
   @JsonRawValue
+  @Column(length=65536)  
   private String diff;
 
   public Long getId() {
@@ -46,7 +53,6 @@ public class MedicationOrder implements Serializable, BaseDeserializable {
 	return careplan;
   }
 
-  @Override
   public void setCareplan(String careplan) {
 	this.careplan = careplan;
   }
@@ -55,7 +61,6 @@ public class MedicationOrder implements Serializable, BaseDeserializable {
 	return action;
   }
 
-  @Override
   public void setAction(String action) {
 	this.action = action;
   }
@@ -64,7 +69,6 @@ public class MedicationOrder implements Serializable, BaseDeserializable {
 	return existing;
   }
 
-  @Override
   public void setExisting(String existing) {
 	this.existing = existing;
   }
@@ -73,7 +77,6 @@ public class MedicationOrder implements Serializable, BaseDeserializable {
 	return proposed;
   }
 
-  @Override
   public void setProposed(String proposed) {
 	this.proposed = proposed;
   }
@@ -82,25 +85,28 @@ public class MedicationOrder implements Serializable, BaseDeserializable {
 	return diff;
   }
 
-  @Override
   public void setDiff(String diff) {
 	this.diff = diff;
   }
 
-  public MedicationOrder(String careplan, String action, String existing, String proposed, String diff) {
+  public String getNominationFor() {
+	return nominationFor;
+  }
+
+  public void setNominationFor(String nominationFor) {
+	this.nominationFor = nominationFor;
+  }
+
+  public OneRing(String careplan, String action, String nominationFor, String existing, String proposed, String diff) {
 	this.careplan = careplan;
 	this.action = action;
+	this.nominationFor = nominationFor;
 	this.existing = existing;
 	this.proposed = proposed;
 	this.diff = diff;
   }
 
-  
-  
-
-  public MedicationOrder() {
+  public OneRing() {
   }
 
-
-  
 }

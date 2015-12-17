@@ -1,10 +1,10 @@
-
 package careshare.nominationService.utils;
 
-import careshare.nominationService.model.BaseDeserializable;
+import careshare.nominationService.model.OneRing;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.flipkart.zjsonpatch.JsonDiff;
 import java.io.IOException;
@@ -13,16 +13,18 @@ import java.io.IOException;
  *
  * @author kcrouch
  */
-public class DiffingDeserializer {
-  
-  public static Object deserialize(JsonParser jp, DeserializationContext ctxt, BaseDeserializable what)throws IOException, JsonProcessingException {
-  JsonNode node = jp.getCodec().readTree(jp);
+public class OneRingDeserializer extends JsonDeserializer<OneRing> {
 
-	  String careplan = node.get("careplan").asText();
+  @Override
+  public OneRing deserialize(JsonParser jp, DeserializationContext dc) throws IOException, JsonProcessingException {
+	return diff(jp, dc, new OneRing());
+  }
+
+ protected OneRing diff(JsonParser jp, DeserializationContext ctxt,OneRing what)throws IOException, JsonProcessingException {
+  JsonNode node = jp.getCodec().readTree(jp);
 	  String action = node.get("action").asText();
 	  JsonNode pNode = node.get("proposed");
 	  JsonNode eNode = node.get("existing");
-	  //JsonNode dNode = node.get("diff");
 	  
 	  String pString = pNode  == null ? null: pNode.toString();
 	  String eString = eNode == null ? null : eNode.toString();
@@ -34,15 +36,12 @@ public class DiffingDeserializer {
 		
 	  if(patch != null) 
 		dString = patch.toString();
+
 	  
 	  what.setAction(action);
-	  what.setCareplan(careplan);
 	  what.setDiff(dString);
 	  what.setExisting(eString);
 	  what.setProposed(pString);
 	  return what;
   }
-
-  
-  
 }
