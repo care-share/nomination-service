@@ -34,6 +34,8 @@ The careplan id is an arbitrary string. The nominationType can be any arbitrary 
 
 The nomination object takes arbitrary JSON objects for the values of the proposed and existing attributes. When both objects are set during insertion, an RFC 6902 (https://tools.ietf.org/html/rfc6902) diff is generated and inserted into the diff attribute. 
 
+For the examples that follow, the nomination service was running on localhost, configured to listen on port 8080.
+
 An example of how to insert a nomination from the curl utility:
 curl -i -X PUT -H "Content-Type:application/json" -d '{ "action": "update", "proposed": {}, "existing": {"prop": "value2", "prop2": 1}}' http://localhost:8080/careplan/17/procedure-requests/
 
