@@ -20,6 +20,7 @@ public class Nomination implements Serializable {
     private Long id;
 
     private String carePlanId;
+    private String authorId; // CareAuth User ID of the person who authored this nomination
     private String action;
 
     @JsonIgnore
@@ -51,6 +52,14 @@ public class Nomination implements Serializable {
 
     public void setCarePlanId(String carePlanId) {
         this.carePlanId = carePlanId;
+    }
+
+    public String getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
     }
 
     public String getAction() {
@@ -93,8 +102,9 @@ public class Nomination implements Serializable {
         this.resourceType = resourceType;
     }
 
-    public Nomination(String carePlanId, String action, String resourceType, String existing, String proposed, String diff) {
+    public Nomination(String carePlanId, String authorId, String action, String resourceType, String existing, String proposed, String diff) {
         this.carePlanId = carePlanId;
+        this.authorId = authorId;
         this.action = action;
         this.resourceType = resourceType;
         this.existing = existing;

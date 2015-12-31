@@ -5,6 +5,7 @@ import java.util.Collection;
 public class ChangeRequest {
 
     private String carePlanId;
+    private String authorId;
     private Collection<Nomination> conditions;
     private Collection<Nomination> goals;
     private Collection<Nomination> medicationOrders;
@@ -20,12 +21,14 @@ public class ChangeRequest {
 
     public ChangeRequest(
             String carePlanId,
+            String authorId,
             Collection<Nomination> conditions,
             Collection<Nomination> goals,
             Collection<Nomination> medicationOrders,
             Collection<Nomination> nutritionOrders,
             Collection<Nomination> procedureRequests) {
         this.carePlanId = carePlanId;
+        this.authorId = authorId;
         this.conditions = conditions;
         this.goals = goals;
         this.medicationOrders = medicationOrders;
@@ -39,6 +42,14 @@ public class ChangeRequest {
 
     public void setCarePlanId(String carePlanId) {
         this.carePlanId = carePlanId;
+    }
+
+    public String getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
     }
 
     public Collection<Nomination> getConditions() {
