@@ -4,109 +4,105 @@ import careshare.nominationService.utils.OneRingDeserializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-/**
- *
- * @author kcrouch
- */
-
 @Entity
 @JsonDeserialize(using = OneRingDeserializer.class)
 public class OneRing implements Serializable {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-  private String careplan;
-  private String action;
-  
-  @JsonIgnore
-  private String nominationFor;
+    private String careplan;
+    private String action;
 
-  @JsonRawValue
-  @Column(length=65536)  
-  private String existing;
+    @JsonIgnore
+    private String nominationFor;
 
-  @JsonRawValue
-  @Column(length=65536)  
-  private String proposed;
+    @JsonRawValue
+    @Column(length = 65536)
+    private String existing;
 
-  @JsonRawValue
-  @Column(length=65536)  
-  private String diff;
+    @JsonRawValue
+    @Column(length = 65536)
+    private String proposed;
 
-  public Long getId() {
-	return id;
-  }
+    @JsonRawValue
+    @Column(length = 65536)
+    private String diff;
 
-  public void setId(Long id) {
-	this.id = id;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public String getCareplan() {
-	return careplan;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public void setCareplan(String careplan) {
-	this.careplan = careplan;
-  }
+    public String getCareplan() {
+        return careplan;
+    }
 
-  public String getAction() {
-	return action;
-  }
+    public void setCareplan(String careplan) {
+        this.careplan = careplan;
+    }
 
-  public void setAction(String action) {
-	this.action = action;
-  }
+    public String getAction() {
+        return action;
+    }
 
-  public String getExisting() {
-	return existing;
-  }
+    public void setAction(String action) {
+        this.action = action;
+    }
 
-  public void setExisting(String existing) {
-	this.existing = existing;
-  }
+    public String getExisting() {
+        return existing;
+    }
 
-  public String getProposed() {
-	return proposed;
-  }
+    public void setExisting(String existing) {
+        this.existing = existing;
+    }
 
-  public void setProposed(String proposed) {
-	this.proposed = proposed;
-  }
+    public String getProposed() {
+        return proposed;
+    }
 
-  public String getDiff() {
-	return diff;
-  }
+    public void setProposed(String proposed) {
+        this.proposed = proposed;
+    }
 
-  public void setDiff(String diff) {
-	this.diff = diff;
-  }
+    public String getDiff() {
+        return diff;
+    }
 
-  public String getNominationFor() {
-	return nominationFor;
-  }
+    public void setDiff(String diff) {
+        this.diff = diff;
+    }
 
-  public void setNominationFor(String nominationFor) {
-	this.nominationFor = nominationFor;
-  }
+    public String getNominationFor() {
+        return nominationFor;
+    }
 
-  public OneRing(String careplan, String action, String nominationFor, String existing, String proposed, String diff) {
-	this.careplan = careplan;
-	this.action = action;
-	this.nominationFor = nominationFor;
-	this.existing = existing;
-	this.proposed = proposed;
-	this.diff = diff;
-  }
+    public void setNominationFor(String nominationFor) {
+        this.nominationFor = nominationFor;
+    }
 
-  public OneRing() {
-  }
+    public OneRing(String careplan, String action, String nominationFor, String existing, String proposed, String diff) {
+        this.careplan = careplan;
+        this.action = action;
+        this.nominationFor = nominationFor;
+        this.existing = existing;
+        this.proposed = proposed;
+        this.diff = diff;
+    }
+
+    public OneRing() {
+    }
 
 }
