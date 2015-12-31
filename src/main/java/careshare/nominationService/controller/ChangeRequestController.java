@@ -47,29 +47,28 @@ class ChangeRequestController {
         Collection<Nomination> nutritionOrders = nominationRepo.findByCarePlanIdAndResourceType(carePlanId, NF_NUTR_ORDER);
         Collection<Nomination> procedureRequests = nominationRepo.findByCarePlanIdAndResourceType(carePlanId, NF_PROC_REQUEST);
 
-        ChangeRequest plan = new ChangeRequest(carePlanId, conditions, nutritionOrders, goals, medOrders, procedureRequests);
-        return plan;
+        return new ChangeRequest(carePlanId, conditions, nutritionOrders, goals, medOrders, procedureRequests);
     }
 
     @RequestMapping("/{carePlanId}/{resourceType}")
     Collection<Nomination> getNominationList(@PathVariable String carePlanId, @PathVariable String resourceType) {
         resourceType = singularize(resourceType);
-        Collection<Nomination> rings = nominationRepo.findByCarePlanIdAndResourceType(carePlanId, resourceType);
-        return rings;
+        return nominationRepo.findByCarePlanIdAndResourceType(carePlanId, resourceType);
     }
 
+    // TODO: change this so we can PUT a nomination and set its ID (will allow us to update/overwrite nominations)
     @RequestMapping(value = "/{carePlanId}/{resourceType}", method = RequestMethod.POST)
     ResponseEntity<?> createNomination(@PathVariable String carePlanId, @PathVariable String resourceType, @RequestBody Nomination input) {
         resourceType = singularize(resourceType);
 
-        Nomination res = new Nomination(carePlanId, input.getAction(), resourceType,
+        Nomination nomination = new Nomination(carePlanId, input.getAction(), resourceType,
                 input.getExisting(), input.getProposed(), input.getDiff());
-        res = nominationRepo.save(res);
+        nomination = nominationRepo.save(nomination);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(res.getId()).toUri());
+                .buildAndExpand(nomination.getId()).toUri());
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 
@@ -77,11 +76,11 @@ class ChangeRequestController {
     Nomination getNomination(@PathVariable String carePlanId, @PathVariable String resourceType, @PathVariable Long nominationId) {
         resourceType = singularize(resourceType);
 
-        Nomination ring = nominationRepo.findByCarePlanIdAndResourceTypeAndId(carePlanId, resourceType, nominationId);
-        if (ring == null) {
+        Nomination nomination = nominationRepo.findByCarePlanIdAndResourceTypeAndId(carePlanId, resourceType, nominationId);
+        if (nomination == null) {
             throw new ItemNotFoundException();
         } else {
-            return ring;
+            return nomination;
         }
     }
 
@@ -91,10 +90,10 @@ class ChangeRequestController {
                           @PathVariable Long nominationId) {
         resourceType = singularize(resourceType);
 
-        Nomination ring = nominationRepo.findByCarePlanIdAndResourceTypeAndId(carePlanId, resourceType, nominationId);
+        Nomination nomination = nominationRepo.findByCarePlanIdAndResourceTypeAndId(carePlanId, resourceType, nominationId);
 
-        if (ring != null) {
-            nominationRepo.delete(ring);
+        if (nomination != null) {
+            nominationRepo.delete(nomination);
         } else {
             throw new ItemNotFoundException();
         }
