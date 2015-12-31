@@ -29,9 +29,9 @@ class ChangeRequestController {
     private final NominationRepo nominationRepo;
 
     private static final String NF_CONDITION = "condition";
-    private static final String NF_DIAG_ORDER = "diagnostic-order";
     private static final String NF_GOAL = "goal";
     private static final String NF_MED_ORDER = "medication-order";
+    private static final String NF_NUTR_ORDER = "nutrition-order";
     private static final String NF_PROC_REQUEST = "procedure-request";
 
     @Autowired
@@ -42,12 +42,12 @@ class ChangeRequestController {
     @RequestMapping(value = "/{carePlanId}", method = RequestMethod.GET)
     ChangeRequest getChangeRequest(@PathVariable String carePlanId) {
         Collection<Nomination> conditions = nominationRepo.findByCarePlanIdAndResourceType(carePlanId, NF_CONDITION);
-        Collection<Nomination> diagnosticOrders = nominationRepo.findByCarePlanIdAndResourceType(carePlanId, NF_DIAG_ORDER);
         Collection<Nomination> goals = nominationRepo.findByCarePlanIdAndResourceType(carePlanId, NF_GOAL);
         Collection<Nomination> medOrders = nominationRepo.findByCarePlanIdAndResourceType(carePlanId, NF_MED_ORDER);
+        Collection<Nomination> nutritionOrders = nominationRepo.findByCarePlanIdAndResourceType(carePlanId, NF_NUTR_ORDER);
         Collection<Nomination> procedureRequests = nominationRepo.findByCarePlanIdAndResourceType(carePlanId, NF_PROC_REQUEST);
 
-        ChangeRequest plan = new ChangeRequest(carePlanId, conditions, diagnosticOrders, goals, medOrders, procedureRequests);
+        ChangeRequest plan = new ChangeRequest(carePlanId, conditions, nutritionOrders, goals, medOrders, procedureRequests);
         return plan;
     }
 

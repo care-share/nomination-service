@@ -30,7 +30,7 @@ Nominations have the following structure on output:
 }
 
 
-The CarePlan id is an arbitrary string. The nominationType can be any arbitrary string, but the ChangeRequest serialization will only include nominations of the following types:"conditions", "diagnostic-orders", "goals", "medication-orders", and "procedure-requests". The contents of "existing", "proposed", and "diff" are configured to have a 64k limit in length. Modifying these values requires recompilation.
+The CarePlan id is an arbitrary string. The nominationType can be any arbitrary string, but the ChangeRequest serialization will only include nominations of the following types:"conditions", "nutrition-orders", "goals", "medication-orders", and "procedure-requests". The contents of "existing", "proposed", and "diff" are configured to have a 64k limit in length. Modifying these values requires recompilation.
 
 The nomination object takes arbitrary JSON objects for the values of the proposed and existing attributes. When both objects are set during insertion, an RFC 6902 (https://tools.ietf.org/html/rfc6902) diff is generated and inserted into the diff attribute.
 
@@ -82,4 +82,4 @@ Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
 Date: Thu, 17 Dec 2015 03:20:54 GMT
 
-{"id":"17","conditions":[],"diagnosticOrders":[],"goals":[],"medicationOrders":[],"procedureRequests":[{"id":18,"carePlanId":"17","action":"update","existing":{"prop":"value2","prop2":1},"proposed":{},"diff":[{"op":"remove","path":"/prop"},{"op":"remove","path":"/prop2"}]}]}
+{"id":"17","conditions":[],"nutritionOrders":[],"goals":[],"medicationOrders":[],"procedureRequests":[{"id":18,"carePlanId":"17","action":"update","existing":{"prop":"value2","prop2":1},"proposed":{},"diff":[{"op":"remove","path":"/prop"},{"op":"remove","path":"/prop2"}]}]}

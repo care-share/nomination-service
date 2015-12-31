@@ -6,9 +6,9 @@ public class ChangeRequest {
 
     private String carePlanId;
     private Collection<Nomination> conditions;
-    private Collection<Nomination> diagnosticOrders;
     private Collection<Nomination> goals;
     private Collection<Nomination> medicationOrders;
+    private Collection<Nomination> nutritionOrders;
     private Collection<Nomination> procedureRequests;
 
     public ChangeRequest() {
@@ -18,12 +18,18 @@ public class ChangeRequest {
         this.carePlanId = carePlanId;
     }
 
-    public ChangeRequest(String carePlanId, Collection<Nomination> conditions, Collection<Nomination> diagnosticOrders, Collection<Nomination> goals, Collection<Nomination> medicationOrders, Collection<Nomination> procedureRequests) {
+    public ChangeRequest(
+            String carePlanId,
+            Collection<Nomination> conditions,
+            Collection<Nomination> goals,
+            Collection<Nomination> medicationOrders,
+            Collection<Nomination> nutritionOrders,
+            Collection<Nomination> procedureRequests) {
         this.carePlanId = carePlanId;
         this.conditions = conditions;
-        this.diagnosticOrders = diagnosticOrders;
         this.goals = goals;
         this.medicationOrders = medicationOrders;
+        this.nutritionOrders = nutritionOrders;
         this.procedureRequests = procedureRequests;
     }
 
@@ -43,14 +49,6 @@ public class ChangeRequest {
         this.conditions = conditions;
     }
 
-    public Collection<Nomination> getDiagnosticOrders() {
-        return diagnosticOrders;
-    }
-
-    public void setDiagnosticOrders(Collection<Nomination> diagnosticOrders) {
-        this.diagnosticOrders = diagnosticOrders;
-    }
-
     public Collection<Nomination> getGoals() {
         return goals;
     }
@@ -65,6 +63,14 @@ public class ChangeRequest {
 
     public void setMedicationOrders(Collection<Nomination> medicationOrders) {
         this.medicationOrders = medicationOrders;
+    }
+
+    public Collection<Nomination> getNutritionOrders() {
+        return nutritionOrders;
+    }
+
+    public void setNutritionOrders(Collection<Nomination> nutritionOrders) {
+        this.nutritionOrders = nutritionOrders;
     }
 
     public Collection<Nomination> getProcedureRequests() {
