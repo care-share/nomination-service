@@ -4,14 +4,15 @@ import careshare.nominationService.model.Nomination;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface NominationRepo extends JpaRepository<Nomination, Long> {
-    String FIND_AUTHORS = "SELECT DISTINCT author_id FROM nomination WHERE care_plan_id = ?1";
+    String FIND_AUTHORS = "SELECT author_id, MAX(timestamp) FROM nomination WHERE care_plan_id = ?1 GROUP BY author_id";
     @Query(value = FIND_AUTHORS, nativeQuery = true)
-    Collection<String> findAuthorIdsByCarePlanId(String carePlanId);
+    List<Object[]> findAuthorIdsByCarePlanId(String carePlanId);
+    // can't auto-magically map a native query to a POJO, need to do it manually in our controller :(
 
-    Collection<Nomination> findByCarePlanIdAndAuthorIdAndResourceType(String carePlanId, String authorId, String resourceType);
+    List<Nomination> findByCarePlanIdAndAuthorIdAndResourceType(String carePlanId, String authorId, String resourceType);
 
     Nomination findByCarePlanIdAndAuthorIdAndResourceTypeAndId(String carePlanId, String authorId, String resourceType, Long id);
 }

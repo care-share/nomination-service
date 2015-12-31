@@ -1,16 +1,18 @@
 package careshare.nominationService.model;
 
-import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 public class ChangeRequest {
 
     private String carePlanId;
     private String authorId;
-    private Collection<Nomination> conditions;
-    private Collection<Nomination> goals;
-    private Collection<Nomination> medicationOrders;
-    private Collection<Nomination> nutritionOrders;
-    private Collection<Nomination> procedureRequests;
+    private Date timestamp;
+    private List<Nomination> conditions;
+    private List<Nomination> goals;
+    private List<Nomination> medicationOrders;
+    private List<Nomination> nutritionOrders;
+    private List<Nomination> procedureRequests;
 
     public ChangeRequest() {
     }
@@ -22,13 +24,15 @@ public class ChangeRequest {
     public ChangeRequest(
             String carePlanId,
             String authorId,
-            Collection<Nomination> conditions,
-            Collection<Nomination> goals,
-            Collection<Nomination> medicationOrders,
-            Collection<Nomination> nutritionOrders,
-            Collection<Nomination> procedureRequests) {
+            Date timestamp,
+            List<Nomination> conditions,
+            List<Nomination> goals,
+            List<Nomination> medicationOrders,
+            List<Nomination> nutritionOrders,
+            List<Nomination> procedureRequests) {
         this.carePlanId = carePlanId;
         this.authorId = authorId;
+        this.timestamp = timestamp; // when the newest Nomination of this ChangeRequest was updated
         this.conditions = conditions;
         this.goals = goals;
         this.medicationOrders = medicationOrders;
@@ -52,43 +56,51 @@ public class ChangeRequest {
         this.authorId = authorId;
     }
 
-    public Collection<Nomination> getConditions() {
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public List<Nomination> getConditions() {
         return conditions;
     }
 
-    public void setConditions(Collection<Nomination> conditions) {
+    public void setConditions(List<Nomination> conditions) {
         this.conditions = conditions;
     }
 
-    public Collection<Nomination> getGoals() {
+    public List<Nomination> getGoals() {
         return goals;
     }
 
-    public void setGoals(Collection<Nomination> goals) {
+    public void setGoals(List<Nomination> goals) {
         this.goals = goals;
     }
 
-    public Collection<Nomination> getMedicationOrders() {
+    public List<Nomination> getMedicationOrders() {
         return medicationOrders;
     }
 
-    public void setMedicationOrders(Collection<Nomination> medicationOrders) {
+    public void setMedicationOrders(List<Nomination> medicationOrders) {
         this.medicationOrders = medicationOrders;
     }
 
-    public Collection<Nomination> getNutritionOrders() {
+    public List<Nomination> getNutritionOrders() {
         return nutritionOrders;
     }
 
-    public void setNutritionOrders(Collection<Nomination> nutritionOrders) {
+    public void setNutritionOrders(List<Nomination> nutritionOrders) {
         this.nutritionOrders = nutritionOrders;
     }
 
-    public Collection<Nomination> getProcedureRequests() {
+    public List<Nomination> getProcedureRequests() {
         return procedureRequests;
     }
 
-    public void setProcedureRequests(Collection<Nomination> procedureRequests) {
+    public void setProcedureRequests(List<Nomination> procedureRequests) {
         this.procedureRequests = procedureRequests;
     }
 }

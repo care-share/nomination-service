@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.io.Serializable;
+import java.util.Comparator;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,6 +23,7 @@ public class Nomination implements Serializable {
 
     private String carePlanId;
     private String authorId; // CareAuth User ID of the person who authored this nomination
+    private Date timestamp; // when this Nomination was last updated
     private String action;
 
     @JsonIgnore
@@ -60,6 +63,14 @@ public class Nomination implements Serializable {
 
     public void setAuthorId(String authorId) {
         this.authorId = authorId;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 
     public String getAction() {
@@ -105,6 +116,7 @@ public class Nomination implements Serializable {
     public Nomination(String carePlanId, String authorId, String action, String resourceType, String existing, String proposed, String diff) {
         this.carePlanId = carePlanId;
         this.authorId = authorId;
+        this.timestamp = new Date(); // set timestamp to whenever this nomination was first created
         this.action = action;
         this.resourceType = resourceType;
         this.existing = existing;
@@ -115,4 +127,11 @@ public class Nomination implements Serializable {
     public Nomination() {
     }
 
+    // this is used to find the Nomination with the newest timestamp
+    public static Comparator<Nomination> TimestampComparator = new Comparator<Nomination>() {
+        public int compare(Nomination item1, Nomination item2) {
+            // ascending order
+            return item1.timestamp.compareTo(item2.timestamp);
+        }
+    };
 }

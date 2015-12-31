@@ -1,11 +1,13 @@
 package careshare.nominationService.controller;
 
 import careshare.nominationService.model.ChangeRequest;
+import careshare.nominationService.model.ChangeRequestAuthor;
 import careshare.nominationService.model.Nomination;
 import careshare.nominationService.repo.NominationRepo;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +43,12 @@ class ChangeRequestController {
     }
 
     @RequestMapping(value = "/{carePlanId}", method = RequestMethod.GET)
-    Collection<ChangeRequest> getChangeRequestList(@PathVariable String carePlanId) {
-        Collection<ChangeRequest> changeRequests = new ArrayList<>();
+    List<ChangeRequest> getChangeRequestList(@PathVariable String carePlanId) {
+        List<ChangeRequest> changeRequests = new ArrayList<>();
 
-        Collection<String> authorIds = nominationRepo.findAuthorIdsByCarePlanId(carePlanId);
-        for (String authorId : authorIds) {
-            ChangeRequest changeRequest = findChangeRequest(carePlanId, authorId);
+        List<ChangeRequestAuthor> authors = findChangeRequestAuthors(carePlanId);
+        for (ChangeRequestAuthor author : authors) {
+            ChangeRequest changeRequest = findChangeRequest(carePlanId, author.getAuthorId());
             changeRequests.add(changeRequest);
         }
 
@@ -54,8 +56,8 @@ class ChangeRequestController {
     }
 
     @RequestMapping(value = "/{carePlanId}/authors", method = RequestMethod.GET)
-    Collection<String> getChangeRequestAuthorList(@PathVariable String carePlanId) {
-        return nominationRepo.findAuthorIdsByCarePlanId(carePlanId);
+    List<ChangeRequestAuthor> getChangeRequestAuthorList(@PathVariable String carePlanId) {
+        return findChangeRequestAuthors(carePlanId);
     }
 
     @RequestMapping(value = "/{carePlanId}/authors/{authorId}", method = RequestMethod.GET)
@@ -64,7 +66,7 @@ class ChangeRequestController {
     }
 
     @RequestMapping("/{carePlanId}/authors/{authorId}/{resourceType}")
-    Collection<Nomination> getNominationList(@PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType) {
+    List<Nomination> getNominationList(@PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType) {
         resourceType = singularize(resourceType);
         return nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, resourceType);
     }
@@ -112,14 +114,31 @@ class ChangeRequestController {
         }
     }
 
-    private ChangeRequest findChangeRequest(String carePlanId, String authorId) {
-        Collection<Nomination> conditions = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, NF_CONDITION);
-        Collection<Nomination> goals = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, NF_GOAL);
-        Collection<Nomination> medOrders = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, NF_MED_ORDER);
-        Collection<Nomination> nutritionOrders = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, NF_NUTR_ORDER);
-        Collection<Nomination> procedureRequests = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, NF_PROC_REQUEST);
+    private List<ChangeRequestAuthor> findChangeRequestAuthors(String carePlanId) {
+        List<Object[]> results = nominationRepo.findAuthorIdsByCarePlanId(carePlanId);
+        List<ChangeRequestAuthor> value = new ArrayList<>();
+        value.addAll(results.stream().map(result -> new ChangeRequestAuthor((String) result[0], (Date) result[1]))
+                .collect(Collectors.toList()));
+        return value;
+    }
 
-        return new ChangeRequest(carePlanId, authorId, conditions, nutritionOrders, goals, medOrders, procedureRequests);
+    private ChangeRequest findChangeRequest(String carePlanId, String authorId) {
+        List<Nomination> conditions = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, NF_CONDITION);
+        List<Nomination> goals = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, NF_GOAL);
+        List<Nomination> medOrders = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, NF_MED_ORDER);
+        List<Nomination> nutritionOrders = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, NF_NUTR_ORDER);
+        List<Nomination> procedureRequests = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, NF_PROC_REQUEST);
+
+        // find the most recent timestamp of this change request
+        List<Nomination> all = Stream.of(conditions, goals, medOrders, nutritionOrders, procedureRequests)
+                .flatMap(Collection::stream).collect(Collectors.toList());
+        if (all.size() == 0) {
+            // there are no Nominations for this CarePlan/Author, therefore there is no ChangeRequest
+            throw new ItemNotFoundException();
+        }
+        Nomination newest = Collections.max(all, Nomination.TimestampComparator);
+
+        return new ChangeRequest(carePlanId, authorId, newest.getTimestamp(), conditions, nutritionOrders, goals, medOrders, procedureRequests);
     }
 
     private String singularize(String resourceType) {
