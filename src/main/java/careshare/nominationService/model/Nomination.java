@@ -8,21 +8,17 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
+@IdClass(NominationKey.class)
 @JsonDeserialize(using = NominationDeserializer.class)
 public class Nomination implements Serializable {
+    // composite primary key, see http://www.objectdb.com/java/jpa/entity/id#Composite_Primary_Key_
+    @Id private String carePlanId; // ID of the FHIR CarePlan that this nomination applies to
+    @Id private String authorId; // CareAuth User ID of the person who authored this nomination
+    @Id private String resourceId; // ID of the FHIR Resource that the author has nominated a change for
 
-    @Id
-    @GeneratedValue
-    private Long id;
-
-    private String carePlanId;
-    private String authorId; // CareAuth User ID of the person who authored this nomination
     private Date timestamp; // when this Nomination was last updated
     private String action;
 
@@ -41,14 +37,6 @@ public class Nomination implements Serializable {
     @Column(length = 65536)
     private String diff;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getCarePlanId() {
         return carePlanId;
     }
@@ -63,6 +51,14 @@ public class Nomination implements Serializable {
 
     public void setAuthorId(String authorId) {
         this.authorId = authorId;
+    }
+
+    public String getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
     }
 
     public Date getTimestamp() {
@@ -113,9 +109,10 @@ public class Nomination implements Serializable {
         this.resourceType = resourceType;
     }
 
-    public Nomination(String carePlanId, String authorId, String action, String resourceType, String existing, String proposed, String diff) {
+    public Nomination(String carePlanId, String authorId, String resourceId, String action, String resourceType, String existing, String proposed, String diff) {
         this.carePlanId = carePlanId;
         this.authorId = authorId;
+        this.resourceId = resourceId;
         this.timestamp = new Date(); // set timestamp to whenever this nomination was first created
         this.action = action;
         this.resourceType = resourceType;

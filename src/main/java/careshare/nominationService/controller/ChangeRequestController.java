@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/change-requests")
@@ -71,27 +70,27 @@ class ChangeRequestController {
         return nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, resourceType);
     }
 
-    // TODO: change this so we can PUT a nomination and set its ID (will allow us to update/overwrite nominations)
-    @RequestMapping(value = "/{carePlanId}/authors/{authorId}/{resourceType}", method = RequestMethod.POST)
-    ResponseEntity<?> createNomination(@PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType, @RequestBody Nomination input) {
+    @RequestMapping(value = "/{carePlanId}/authors/{authorId}/{resourceType}/{resourceId}", method = RequestMethod.PUT)
+    ResponseEntity<?> createNomination(
+            @PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType,
+            @PathVariable String resourceId, @RequestBody Nomination input) {
         resourceType = singularize(resourceType);
 
-        Nomination nomination = new Nomination(carePlanId, authorId, input.getAction(), resourceType,
+        Nomination nomination = new Nomination(carePlanId, authorId, resourceId, input.getAction(), resourceType,
                 input.getExisting(), input.getProposed(), input.getDiff());
-        nomination = nominationRepo.save(nomination);
+        nominationRepo.save(nomination);
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(nomination.getId()).toUri());
-        return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
+        // TODO: return HttpStatus.NO_CONTENT if the resource was updated
+        return new ResponseEntity<>(null, null, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{carePlanId}/authors/{authorId}/{resourceType}/{nominationId}", method = RequestMethod.GET)
-    Nomination getNomination(@PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType, @PathVariable Long nominationId) {
-        resourceType = singularize(resourceType);
+    @RequestMapping(value = "/{carePlanId}/authors/{authorId}/{resourceType}/{resourceId}", method = RequestMethod.GET)
+    Nomination getNomination(
+            @PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType,
+            @PathVariable String resourceId) {
 
-        Nomination nomination = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceTypeAndId(carePlanId, authorId, resourceType, nominationId);
+        Nomination nomination = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceId(
+                carePlanId, authorId, resourceId);
         if (nomination == null) {
             throw new ItemNotFoundException();
         } else {
@@ -99,13 +98,14 @@ class ChangeRequestController {
         }
     }
 
-    @RequestMapping(value = "/{carePlanId}/authors/{authorId}/{resourceType}/{nominationId}",
+    @RequestMapping(value = "/{carePlanId}/authors/{authorId}/{resourceType}/{resourceId}",
             method = RequestMethod.DELETE)
-    void deleteNomination(@PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType,
-                          @PathVariable Long nominationId) {
-        resourceType = singularize(resourceType);
+    void deleteNomination(
+            @PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType,
+            @PathVariable String resourceId) {
 
-        Nomination nomination = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceTypeAndId(carePlanId, authorId, resourceType, nominationId);
+        Nomination nomination = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceId(
+                carePlanId, authorId, resourceId);
 
         if (nomination != null) {
             nominationRepo.delete(nomination);
@@ -138,7 +138,7 @@ class ChangeRequestController {
         }
         Nomination newest = Collections.max(all, Nomination.TimestampComparator);
 
-        return new ChangeRequest(carePlanId, authorId, newest.getTimestamp(), conditions, nutritionOrders, goals, medOrders, procedureRequests);
+        return new ChangeRequest(carePlanId, authorId, newest.getTimestamp(), conditions, goals, medOrders,  nutritionOrders, procedureRequests);
     }
 
     private String singularize(String resourceType) {
