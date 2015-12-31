@@ -1,6 +1,6 @@
 package careshare.nominationService.model;
 
-import careshare.nominationService.utils.OneRingDeserializer;
+import careshare.nominationService.utils.NominationDeserializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -12,18 +12,18 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
-@JsonDeserialize(using = OneRingDeserializer.class)
-public class OneRing implements Serializable {
+@JsonDeserialize(using = NominationDeserializer.class)
+public class Nomination implements Serializable {
 
     @Id
     @GeneratedValue
     private Long id;
 
-    private String careplan;
+    private String carePlanId;
     private String action;
 
     @JsonIgnore
-    private String nominationFor;
+    private String resourceType;
 
     @JsonRawValue
     @Column(length = 65536)
@@ -45,12 +45,12 @@ public class OneRing implements Serializable {
         this.id = id;
     }
 
-    public String getCareplan() {
-        return careplan;
+    public String getCarePlanId() {
+        return carePlanId;
     }
 
-    public void setCareplan(String careplan) {
-        this.careplan = careplan;
+    public void setCarePlanId(String carePlanId) {
+        this.carePlanId = carePlanId;
     }
 
     public String getAction() {
@@ -85,24 +85,24 @@ public class OneRing implements Serializable {
         this.diff = diff;
     }
 
-    public String getNominationFor() {
-        return nominationFor;
+    public String getResourceType() {
+        return resourceType;
     }
 
-    public void setNominationFor(String nominationFor) {
-        this.nominationFor = nominationFor;
+    public void setResourceType(String resourceType) {
+        this.resourceType = resourceType;
     }
 
-    public OneRing(String careplan, String action, String nominationFor, String existing, String proposed, String diff) {
-        this.careplan = careplan;
+    public Nomination(String carePlanId, String action, String resourceType, String existing, String proposed, String diff) {
+        this.carePlanId = carePlanId;
         this.action = action;
-        this.nominationFor = nominationFor;
+        this.resourceType = resourceType;
         this.existing = existing;
         this.proposed = proposed;
         this.diff = diff;
     }
 
-    public OneRing() {
+    public Nomination() {
     }
 
 }

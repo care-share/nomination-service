@@ -1,6 +1,6 @@
 package careshare.nominationService.utils;
 
-import careshare.nominationService.model.OneRing;
+import careshare.nominationService.model.Nomination;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -10,14 +10,14 @@ import com.flipkart.zjsonpatch.JsonDiff;
 
 import java.io.IOException;
 
-public class OneRingDeserializer extends JsonDeserializer<OneRing> {
+public class NominationDeserializer extends JsonDeserializer<Nomination> {
 
     @Override
-    public OneRing deserialize(JsonParser jp, DeserializationContext dc) throws IOException, JsonProcessingException {
-        return diff(jp, dc, new OneRing());
+    public Nomination deserialize(JsonParser jp, DeserializationContext dc) throws IOException, JsonProcessingException {
+        return diff(jp, dc, new Nomination());
     }
 
-    protected OneRing diff(JsonParser jp, DeserializationContext ctxt, OneRing what) throws IOException, JsonProcessingException {
+    protected Nomination diff(JsonParser jp, DeserializationContext ctxt, Nomination what) throws IOException, JsonProcessingException {
         JsonNode node = jp.getCodec().readTree(jp);
         String action = node.get("action").asText();
         JsonNode pNode = node.get("proposed");
