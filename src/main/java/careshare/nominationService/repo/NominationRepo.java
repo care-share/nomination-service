@@ -12,6 +12,10 @@ public interface NominationRepo extends JpaRepository<Nomination, Long> {
     List<Object[]> findAuthorIdsByCarePlanId(String carePlanId);
     // can't auto-magically map a native query to a POJO, need to do it manually in our controller :(
 
+    List<Nomination> findByCarePlanIdAndResourceType(String carePlanId, String resourceType);
+
+    List<Nomination> findByCarePlanIdAndResourceId(String carePlanId, String resourceId);
+
     List<Nomination> findByCarePlanIdAndAuthorIdAndResourceType(String carePlanId, String authorId, String resourceType);
 
     Nomination findByCarePlanIdAndAuthorIdAndResourceId(String carePlanId, String authorId, String resourceId);

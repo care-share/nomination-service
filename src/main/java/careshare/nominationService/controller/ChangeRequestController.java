@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -64,8 +63,14 @@ class ChangeRequestController {
         return findChangeRequest(carePlanId, authorId);
     }
 
-    @RequestMapping("/{carePlanId}/authors/{authorId}/{resourceType}")
-    List<Nomination> getNominationList(@PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType) {
+    @RequestMapping(value = "/{carePlanId}/authors/all/{resourceType}", method = RequestMethod.GET)
+    List<Nomination> getNominationListForAllAuthors(@PathVariable String carePlanId, @PathVariable String resourceType) {
+        resourceType = singularize(resourceType);
+        return nominationRepo.findByCarePlanIdAndResourceType(carePlanId, resourceType);
+    }
+
+    @RequestMapping(value = "/{carePlanId}/authors/{authorId}/{resourceType}", method = RequestMethod.GET)
+    List<Nomination> getNominationListForAuthor(@PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType) {
         resourceType = singularize(resourceType);
         return nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, resourceType);
     }
@@ -84,10 +89,15 @@ class ChangeRequestController {
         return new ResponseEntity<>(null, null, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{carePlanId}/authors/{authorId}/{resourceType}/{resourceId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{carePlanId}/authors/all/resources/{resourceId}", method = RequestMethod.GET)
+    List<Nomination> getNominationList(@PathVariable String carePlanId, @PathVariable String resourceId) {
+        // finds all nominations for a given resource (returns results from multiple authors
+        return nominationRepo.findByCarePlanIdAndResourceId(carePlanId, resourceId);
+    }
+
+    @RequestMapping(value = "/{carePlanId}/authors/{authorId}/resources/{resourceId}", method = RequestMethod.GET)
     Nomination getNomination(
-            @PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType,
-            @PathVariable String resourceId) {
+            @PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceId) {
 
         Nomination nomination = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceId(
                 carePlanId, authorId, resourceId);
@@ -98,11 +108,9 @@ class ChangeRequestController {
         }
     }
 
-    @RequestMapping(value = "/{carePlanId}/authors/{authorId}/{resourceType}/{resourceId}",
-            method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{carePlanId}/authors/{authorId}/resources/{resourceId}", method = RequestMethod.DELETE)
     void deleteNomination(
-            @PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType,
-            @PathVariable String resourceId) {
+            @PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceId) {
 
         Nomination nomination = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceId(
                 carePlanId, authorId, resourceId);
