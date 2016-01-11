@@ -29,11 +29,11 @@ class ChangeRequestController {
 
     private final NominationRepo nominationRepo;
 
-    private static final String NF_CONDITION = "condition";
-    private static final String NF_GOAL = "goal";
-    private static final String NF_MED_ORDER = "medication-order";
-    private static final String NF_NUTR_ORDER = "nutrition-order";
-    private static final String NF_PROC_REQUEST = "procedure-request";
+    private static final String RES_PROBLEM = "condition";
+    private static final String RES_GOAL = "goal";
+    private static final String RES_MEDICATION = "medication-order";
+    private static final String RES_NUTRITION = "nutrition-order";
+    private static final String RES_INTERVENTION = "procedure-request";
 
     @Autowired
     ChangeRequestController(NominationRepo nominationRepo) {
@@ -131,11 +131,11 @@ class ChangeRequestController {
     }
 
     private ChangeRequest findChangeRequest(String carePlanId, String authorId) {
-        List<Nomination> conditions = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, NF_CONDITION);
-        List<Nomination> goals = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, NF_GOAL);
-        List<Nomination> medOrders = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, NF_MED_ORDER);
-        List<Nomination> nutritionOrders = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, NF_NUTR_ORDER);
-        List<Nomination> procedureRequests = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, NF_PROC_REQUEST);
+        List<Nomination> conditions = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, RES_PROBLEM);
+        List<Nomination> goals = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, RES_GOAL);
+        List<Nomination> medOrders = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, RES_MEDICATION);
+        List<Nomination> nutritionOrders = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, RES_NUTRITION);
+        List<Nomination> procedureRequests = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, RES_INTERVENTION);
 
         // find the most recent timestamp of this change request
         List<Nomination> all = Stream.of(conditions, goals, medOrders, nutritionOrders, procedureRequests)
@@ -150,11 +150,20 @@ class ChangeRequestController {
     }
 
     private String singularize(String resourceType) {
+        String value;
         if (resourceType.endsWith("s")) {
-            return resourceType.substring(0, resourceType.length() - 1);
+            value = resourceType.substring(0, resourceType.length() - 1);
         } else {
-            return resourceType;
+            value = resourceType;
         }
+
+        // validate the resource type
+        if (!RES_PROBLEM.equals(value) && !RES_GOAL.equals(value) && !RES_MEDICATION.equals(value)
+                && !RES_NUTRITION.equals(value) && !RES_INTERVENTION.equals(value)) {
+            throw new ItemNotFoundException();
+        }
+
+        return value;
     }
 
 }
