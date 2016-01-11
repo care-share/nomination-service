@@ -5,7 +5,7 @@ import java.util.List;
 
 public class ChangeRequest {
 
-    private String carePlanId;
+    private String patientId;
     private String authorId;
     private Date timestamp;
     private List<Nomination> conditions;
@@ -17,12 +17,12 @@ public class ChangeRequest {
     public ChangeRequest() {
     }
 
-    public ChangeRequest(String carePlanId) {
-        this.carePlanId = carePlanId;
+    public ChangeRequest(String patientId) {
+        this.patientId = patientId;
     }
 
     public ChangeRequest(
-            String carePlanId,
+            String patientId,
             String authorId,
             Date timestamp,
             List<Nomination> conditions,
@@ -30,7 +30,7 @@ public class ChangeRequest {
             List<Nomination> medicationOrders,
             List<Nomination> nutritionOrders,
             List<Nomination> procedureRequests) {
-        this.carePlanId = carePlanId;
+        this.patientId = patientId;
         this.authorId = authorId;
         this.timestamp = timestamp; // when the newest Nomination of this ChangeRequest was updated
         this.conditions = conditions;
@@ -40,12 +40,12 @@ public class ChangeRequest {
         this.procedureRequests = procedureRequests;
     }
 
-    public String getCarePlanId() {
-        return carePlanId;
+    public String getPatientId() {
+        return patientId;
     }
 
-    public void setCarePlanId(String carePlanId) {
-        this.carePlanId = carePlanId;
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
     }
 
     public String getAuthorId() {

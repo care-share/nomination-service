@@ -15,7 +15,7 @@ import javax.persistence.*;
 @JsonDeserialize(using = NominationDeserializer.class)
 public class Nomination implements Serializable {
     // composite primary key, see http://www.objectdb.com/java/jpa/entity/id#Composite_Primary_Key_
-    @Id private String carePlanId; // ID of the FHIR CarePlan that this nomination applies to
+    @Id private String patientId; // ID of the FHIR Patient that this nomination applies to
     @Id private String authorId; // CareAuth User ID of the person who authored this nomination
     @Id private String resourceId; // ID of the FHIR Resource that the author has nominated a change for
 
@@ -37,12 +37,12 @@ public class Nomination implements Serializable {
     @Column(length = 65536)
     private String diff;
 
-    public String getCarePlanId() {
-        return carePlanId;
+    public String getPatientId() {
+        return patientId;
     }
 
-    public void setCarePlanId(String carePlanId) {
-        this.carePlanId = carePlanId;
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
     }
 
     public String getAuthorId() {
@@ -109,8 +109,8 @@ public class Nomination implements Serializable {
         this.resourceType = resourceType;
     }
 
-    public Nomination(String carePlanId, String authorId, String resourceId, String action, String resourceType, String existing, String proposed, String diff) {
-        this.carePlanId = carePlanId;
+    public Nomination(String patientId, String authorId, String resourceId, String action, String resourceType, String existing, String proposed, String diff) {
+        this.patientId = patientId;
         this.authorId = authorId;
         this.resourceId = resourceId;
         this.timestamp = new Date(); // set timestamp to whenever this nomination was first created
