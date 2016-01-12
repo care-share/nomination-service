@@ -7,16 +7,16 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface NominationRepo extends JpaRepository<Nomination, Long> {
-    String FIND_AUTHORS = "SELECT author_id, MAX(timestamp) FROM nomination WHERE patient_id = ?1 GROUP BY author_id";
+    String FIND_AUTHORS = "SELECT author_id, MAX(timestamp) FROM nomination WHERE care_plan_id = ?1 GROUP BY author_id";
     @Query(value = FIND_AUTHORS, nativeQuery = true)
-    List<Object[]> findAuthorIdsByPatientId(String patientId);
+    List<Object[]> findAuthorIdsByCarePlanId(String carePlanId);
     // can't auto-magically map a native query to a POJO, need to do it manually in our controller :(
 
-    List<Nomination> findByPatientIdAndResourceType(String patientId, String resourceType);
+    List<Nomination> findByCarePlanIdAndResourceType(String carePlanId, String resourceType);
 
-    List<Nomination> findByPatientIdAndResourceId(String patientId, String resourceId);
+    List<Nomination> findByCarePlanIdAndResourceId(String carePlanId, String resourceId);
 
-    List<Nomination> findByPatientIdAndAuthorIdAndResourceType(String patientId, String authorId, String resourceType);
+    List<Nomination> findByCarePlanIdAndAuthorIdAndResourceType(String carePlanId, String authorId, String resourceType);
 
-    Nomination findByPatientIdAndAuthorIdAndResourceId(String patientId, String authorId, String resourceId);
+    Nomination findByCarePlanIdAndAuthorIdAndResourceId(String carePlanId, String authorId, String resourceId);
 }
