@@ -8,11 +8,11 @@ public class ChangeRequest {
     private String carePlanId;
     private String authorId;
     private Date timestamp;
-    private List<Nomination> conditions;
+//    private List<Nomination> conditions;
     private List<Nomination> goals;
-    private List<Nomination> medicationOrders;
-    private List<Nomination> nutritionOrders;
     private List<Nomination> procedureRequests;
+    private List<Nomination> nutritionOrders;
+//    private List<Nomination> medicationOrders;
 
     public ChangeRequest() {
     }
@@ -22,22 +22,23 @@ public class ChangeRequest {
     }
 
     public ChangeRequest(
-            String carePlanId,
-            String authorId,
-            Date timestamp,
-            List<Nomination> conditions,
-            List<Nomination> goals,
-            List<Nomination> medicationOrders,
-            List<Nomination> nutritionOrders,
-            List<Nomination> procedureRequests) {
+            String carePlanId
+            , String authorId
+            , Date timestamp
+//            , List<Nomination> conditions
+            , List<Nomination> goals
+            , List<Nomination> procedureRequests
+            , List<Nomination> nutritionOrders
+//            , List<Nomination> medicationOrders
+    ) {
         this.carePlanId = carePlanId;
         this.authorId = authorId;
         this.timestamp = timestamp; // when the newest Nomination of this ChangeRequest was updated
-        this.conditions = conditions;
+//        this.conditions = conditions;
         this.goals = goals;
-        this.medicationOrders = medicationOrders;
-        this.nutritionOrders = nutritionOrders;
         this.procedureRequests = procedureRequests;
+        this.nutritionOrders = nutritionOrders;
+//        this.medicationOrders = medicationOrders;
     }
 
     public String getCarePlanId() {
@@ -64,13 +65,13 @@ public class ChangeRequest {
         this.timestamp = timestamp;
     }
 
-    public List<Nomination> getConditions() {
-        return conditions;
-    }
-
-    public void setConditions(List<Nomination> conditions) {
-        this.conditions = conditions;
-    }
+//    public List<Nomination> getConditions() {
+//        return conditions;
+//    }
+//
+//    public void setConditions(List<Nomination> conditions) {
+//        this.conditions = conditions;
+//    }
 
     public List<Nomination> getGoals() {
         return goals;
@@ -80,12 +81,12 @@ public class ChangeRequest {
         this.goals = goals;
     }
 
-    public List<Nomination> getMedicationOrders() {
-        return medicationOrders;
+    public List<Nomination> getProcedureRequests() {
+        return procedureRequests;
     }
 
-    public void setMedicationOrders(List<Nomination> medicationOrders) {
-        this.medicationOrders = medicationOrders;
+    public void setProcedureRequests(List<Nomination> procedureRequests) {
+        this.procedureRequests = procedureRequests;
     }
 
     public List<Nomination> getNutritionOrders() {
@@ -96,11 +97,11 @@ public class ChangeRequest {
         this.nutritionOrders = nutritionOrders;
     }
 
-    public List<Nomination> getProcedureRequests() {
-        return procedureRequests;
-    }
-
-    public void setProcedureRequests(List<Nomination> procedureRequests) {
-        this.procedureRequests = procedureRequests;
-    }
+//    public List<Nomination> getMedicationOrders() {
+//        return medicationOrders;
+//    }
+//
+//    public void setMedicationOrders(List<Nomination> medicationOrders) {
+//        this.medicationOrders = medicationOrders;
+//    }
 }
