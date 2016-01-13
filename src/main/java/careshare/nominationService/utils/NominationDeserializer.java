@@ -6,6 +6,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flipkart.zjsonpatch.JsonDiff;
 
 import java.io.IOException;
@@ -28,12 +31,32 @@ public class NominationDeserializer extends JsonDeserializer<Nomination> {
         String dString = null;
         JsonNode patch = null;
 
+	ObjectMapper mapper = new ObjectMapper();
+
         if (pNode != null || eNode != null)
             patch = JsonDiff.asJson(eNode, pNode);
 
-        if (patch != null)
+        if (patch != null){
+	    //	    ((ObjectNode)patch.get(0)).put("testfirstpath", patch.get(0).findValue("path").asText());
+	    for (int i = 0; i < patch.size(); i++) {
+		JsonNode attributePatch = patch.get(i);
+		String attributePathString = attributePatch.findValue("path").asText();
+		// iterate through the path, and walk a pointer down to the value of the patched attribute in the existing resource
+		JsonNode pointer = eNode; 
+		for (String pathStep: attributePathString.split("/")){
+		    if (pathStep.equals("")) // pathStep is not a real step
+			continue;
+		    if (pathStep.matches("^-?\\d+$")){ // pathStep is an Array index
+			pointer = pointer.get(Integer.parseInt(pathStep.trim()));
+		    } else { // pathStep is a dictionary key
+			pointer = pointer.get(pathStep);
+		    }
+		}
+		// add the original attribute value info to the attribute patch
+		((ObjectNode)attributePatch).put("originalValue", pointer);
+	    }
             dString = patch.toString();
-
+	}
 
         what.setAction(action);
         what.setDiff(dString);
