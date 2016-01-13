@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/change-requests")
+@RequestMapping("/care-plans")
 class ChangeRequestController {
 
     private final NominationRepo nominationRepo;

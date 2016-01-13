@@ -4,13 +4,13 @@ java -jar nominationService-0.1.0.jar
 
 The service registers the following endpoints:
 
-/change-requests/{carePlanId} (GET) -> returns a JSON representation of a list of ChangeRequest objects for a given CarePlan, along with its associated nominations. This is a virtual object that is built from nomination objects saved in the database and is not directly represented in the database.
-/change-requests/{carePlanId}/authors (GET) -> returns a JSON representation of all authors of ChangeRequests for a given CarePlan
-/change-requests/{carePlanId}/authors/{authorId} (GET) -> returns a JSON representation of a ChangeRequest object for a given CarePlan and Author, along with its associated nominations. This is a virtual object that is built from nomination objects saved in the database and is not directly represented in the database.
-/change-requests/{carePlanId}/authors/{authorId}/{resourceType} (GET) -> returns a JSON collection of nominations of {resourceType}, an arbitrary string
-/change-requests/{carePlanId}/authors/{authorId}/{resourceType}/{resourceId} (PUT) -> creates a nomination from a JSON object of type {resourceType}, an arbitrary string
-/change-requests/{carePlanId}/authors/{authorId}/resources/{resourceId} (GET) -> returns a JSON representation of a nomination object
-/change-requests/{carePlanId}/authors/{authorId}/resources/{resourceId} (DELETE) -> delete a specific nomination object
+/care-plans/{carePlanId} (GET) -> returns a JSON representation of a list of ChangeRequest objects for a given CarePlan, along with its associated nominations. This is a virtual object that is built from nomination objects saved in the database and is not directly represented in the database.
+/care-plans/{carePlanId}/authors (GET) -> returns a JSON representation of all authors of ChangeRequests for a given CarePlan
+/care-plans/{carePlanId}/authors/{authorId} (GET) -> returns a JSON representation of a ChangeRequest object for a given CarePlan and Author, along with its associated nominations. This is a virtual object that is built from nomination objects saved in the database and is not directly represented in the database.
+/care-plans/{carePlanId}/authors/{authorId}/{resourceType} (GET) -> returns a JSON collection of nominations of {resourceType}, an arbitrary string
+/care-plans/{carePlanId}/authors/{authorId}/{resourceType}/{resourceId} (PUT) -> creates a nomination from a JSON object of type {resourceType}, an arbitrary string
+/care-plans/{carePlanId}/authors/{authorId}/resources/{resourceId} (GET) -> returns a JSON representation of a nomination object
+/care-plans/{carePlanId}/authors/{authorId}/resources/{resourceId} (DELETE) -> delete a specific nomination object
 
 Nominations have the following structure on input:
 {
