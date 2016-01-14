@@ -1,0 +1,4 @@
+nomination-service:
+  build: .
+  ports:
+    - "7293:7293"
