@@ -49,6 +49,8 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
+        <!-- disable adding version number in artifact name -->
+        <finalName>${artifactId}</finalName>
     </build>
 
     <repositories>
