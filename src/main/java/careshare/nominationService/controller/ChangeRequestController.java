@@ -122,13 +122,12 @@ class ChangeRequestController {
         }
     }
 
-    @RequestMapping(value = "/{carePlanId}/authors/all/resources/{resourceId}", method = RequestMethod.DELETE)
-    void deleteNominationsForAllAuthors(
-            @PathVariable String carePlanId, @PathVariable String resourceId) {
+    @RequestMapping(value = "/all/authors/all/resources/{resourceId}", method = RequestMethod.DELETE)
+    void deleteAllNominationsForResource(@PathVariable String resourceId) {
 
-        List<Nomination> nominations = nominationRepo.findByCarePlanIdAndResourceId(
-                carePlanId, resourceId);
+        List<Nomination> nominations = nominationRepo.findByResourceId(resourceId);
 
+        // NOTE: this will delete ALL nominations for this resourceId (not just those that have a 'delete' action)
         nominations.forEach(nominationRepo::delete);
         // should we return 404 if no nominations exist?
     }
