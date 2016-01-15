@@ -28,35 +28,35 @@ public class NominationDeserializer extends JsonDeserializer<Nomination> {
 
         String pString = pNode == null ? null : pNode.toString();
         String eString = eNode == null ? null : eNode.toString();
-        String dString = null;
+        String dString = "[]";
         JsonNode patch = null;
 
-	ObjectMapper mapper = new ObjectMapper();
+        if (action.equals("update")) {
+            // only generate a diff string for Nominations that have an 'update' action
+            if (pNode != null || eNode != null)
+                patch = JsonDiff.asJson(eNode, pNode);
 
-        if (pNode != null || eNode != null)
-            patch = JsonDiff.asJson(eNode, pNode);
-
-        if (patch != null){
-	    //	    ((ObjectNode)patch.get(0)).put("testfirstpath", patch.get(0).findValue("path").asText());
-	    for (int i = 0; i < patch.size(); i++) {
-		JsonNode attributePatch = patch.get(i);
-		String attributePathString = attributePatch.findValue("path").asText();
-		// iterate through the path, and walk a pointer down to the value of the patched attribute in the existing resource
-		JsonNode pointer = eNode; 
-		for (String pathStep: attributePathString.split("/")){
-		    if (pathStep.equals("")) // pathStep is not a real step
-			continue;
-		    if (pathStep.matches("^-?\\d+$")){ // pathStep is an Array index
-			pointer = pointer.get(Integer.parseInt(pathStep.trim()));
-		    } else { // pathStep is a dictionary key
-			pointer = pointer.get(pathStep);
-		    }
-		}
-		// add the original attribute value info to the attribute patch
-		((ObjectNode)attributePatch).put("originalValue", pointer);
-	    }
-            dString = patch.toString();
-	}
+            if (patch != null) {
+                for (int i = 0; i < patch.size(); i++) {
+                    JsonNode attributePatch = patch.get(i);
+                    String attributePathString = attributePatch.findValue("path").asText();
+                    // iterate through the path, and walk a pointer down to the value of the patched attribute in the existing resource
+                    JsonNode pointer = eNode;
+                    for (String pathStep : attributePathString.split("/")) {
+                        if (pathStep.equals("")) // pathStep is not a real step
+                            continue;
+                        if (pathStep.matches("^-?\\d+$")) { // pathStep is an Array index
+                            pointer = pointer.get(Integer.parseInt(pathStep.trim()));
+                        } else { // pathStep is a dictionary key
+                            pointer = pointer.get(pathStep);
+                        }
+                    }
+                    // add the original attribute value info to the attribute patch
+                    ((ObjectNode) attributePatch).put("originalValue", pointer);
+                }
+                dString = patch.toString();
+            }
+        }
 
         what.setAction(action);
         what.setDiff(dString);
