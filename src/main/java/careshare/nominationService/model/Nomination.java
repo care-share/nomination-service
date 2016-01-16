@@ -15,10 +15,10 @@ import javax.persistence.*;
 @JsonDeserialize(using = NominationDeserializer.class)
 public class Nomination implements Serializable {
     // composite primary key, see http://www.objectdb.com/java/jpa/entity/id#Composite_Primary_Key_
-    @Id private String carePlanId; // ID of the FHIR CarePlan that this nomination applies to
     @Id private String authorId; // CareAuth User ID of the person who authored this nomination
     @Id private String resourceId; // ID of the FHIR Resource that the author has nominated a change for
 
+    private String carePlanId; // ID of the FHIR CarePlan that this nomination applies to
     private Date timestamp; // when this Nomination was last updated
     private String action;
 

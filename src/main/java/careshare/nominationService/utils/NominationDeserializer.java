@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flipkart.zjsonpatch.JsonDiff;
 
 import java.io.IOException;
+import java.util.Date;
 
 public class NominationDeserializer extends JsonDeserializer<Nomination> {
 
@@ -22,6 +23,10 @@ public class NominationDeserializer extends JsonDeserializer<Nomination> {
 
     protected Nomination diff(JsonParser jp, DeserializationContext ctxt, Nomination what) throws IOException, JsonProcessingException {
         JsonNode node = jp.getCodec().readTree(jp);
+        String authorId = node.get("authorId").asText();
+        String resourceId = node.get("resourceId").asText();
+        String carePlanId = node.get("carePlanId").asText();
+        String resourceType = node.get("resourceType").asText();
         String action = node.get("action").asText();
         JsonNode pNode = node.get("proposed");
         JsonNode eNode = node.get("existing");
@@ -58,6 +63,11 @@ public class NominationDeserializer extends JsonDeserializer<Nomination> {
             }
         }
 
+        what.setAuthorId(authorId);
+        what.setResourceId(resourceId);
+        what.setCarePlanId(carePlanId);
+        what.setResourceType(resourceType);
+        what.setTimestamp(new Date());
         what.setAction(action);
         what.setDiff(dString);
         what.setExisting(eString);

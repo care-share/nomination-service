@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/care-plans")
+@RequestMapping("/")
 class ChangeRequestController {
 
     private final NominationRepo nominationRepo;
@@ -40,7 +40,10 @@ class ChangeRequestController {
         this.nominationRepo = nominationRepo;
     }
 
-    @RequestMapping(value = "/{carePlanId}", method = RequestMethod.GET)
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // CHANGE REQUESTS
+
+    @RequestMapping(value = "change-requests/care-plan-id/{carePlanId}", method = RequestMethod.GET)
     List<ChangeRequest> getChangeRequestList(@PathVariable String carePlanId) {
         List<ChangeRequest> changeRequests = new ArrayList<>();
 
@@ -53,54 +56,45 @@ class ChangeRequestController {
         return changeRequests;
     }
 
-    @RequestMapping(value = "/{carePlanId}/authors", method = RequestMethod.GET)
-    List<ChangeRequestAuthor> getChangeRequestAuthorList(@PathVariable String carePlanId) {
-        return findChangeRequestAuthors(carePlanId);
-    }
-
-    @RequestMapping(value = "/{carePlanId}/authors/{authorId}", method = RequestMethod.GET)
+    @RequestMapping(value = "change-requests/care-plan-id/{carePlanId}/author-id/{authorId}", method = RequestMethod.GET)
     ChangeRequest getChangeRequest(@PathVariable String carePlanId, @PathVariable String authorId) {
         return findChangeRequest(carePlanId, authorId);
     }
 
-    @RequestMapping(value = "/{carePlanId}/authors/all/{resourceType}", method = RequestMethod.GET)
-    List<Nomination> getNominationListForAllAuthors(@PathVariable String carePlanId, @PathVariable String resourceType) {
-        resourceType = singularize(resourceType);
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // AUTHORS
+
+    @RequestMapping(value = "authors/care-plan-id/{carePlanId}", method = RequestMethod.GET)
+    List<ChangeRequestAuthor> getChangeRequestAuthorList(@PathVariable String carePlanId) {
+        return findChangeRequestAuthors(carePlanId);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // NOMINATIONS
+
+    @RequestMapping(value = "nominations/care-plan-id/{carePlanId}/resource-type/{resourceType}", method = RequestMethod.GET)
+    List<Nomination> getNominationsForCarePlanIdAndResourceType(@PathVariable String carePlanId, @PathVariable String resourceType) {
+        // for all authors of nominations that refer to this CarePlan, filter by resource type
         return nominationRepo.findByCarePlanIdAndResourceType(carePlanId, resourceType);
     }
 
-    @RequestMapping(value = "/{carePlanId}/authors/{authorId}/{resourceType}", method = RequestMethod.GET)
-    List<Nomination> getNominationListForAuthor(@PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType) {
-        resourceType = singularize(resourceType);
+    @RequestMapping(value = "nominations/care-plan-id/{carePlanId}/author-id/{authorId}/resource-type/{resourceType}", method = RequestMethod.GET)
+    List<Nomination> getNominationsForCarePlanIdAndAuthorIdAndResourceType(
+            @PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType) {
+        // for a single author of nominations that refer to this CarePlan, filter by resource type
         return nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, resourceType);
     }
 
-    @RequestMapping(value = "/{carePlanId}/authors/{authorId}/{resourceType}/{resourceId}", method = RequestMethod.PUT)
-    ResponseEntity<?> createNomination(
-            @PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType,
-            @PathVariable String resourceId, @RequestBody Nomination input) {
-        resourceType = singularize(resourceType);
-
-        Nomination nomination = new Nomination(carePlanId, authorId, resourceId, input.getAction(), resourceType,
-                input.getExisting(), input.getProposed(), input.getDiff());
-        nominationRepo.save(nomination);
-
-        // TODO: return HttpStatus.NO_CONTENT if the resource was updated
-        return new ResponseEntity<>(null, null, HttpStatus.CREATED);
+    @RequestMapping(value = "nominations/resource-id/{resourceId}", method = RequestMethod.GET)
+    List<Nomination> getNominationsForResourceId(@PathVariable String resourceId) {
+        // for all authors of nominations that refer to this Resource
+        return nominationRepo.findByResourceId(resourceId);
     }
 
-    @RequestMapping(value = "/{carePlanId}/authors/all/resources/{resourceId}", method = RequestMethod.GET)
-    List<Nomination> getNominationList(@PathVariable String carePlanId, @PathVariable String resourceId) {
-        // finds all nominations for a given resource (returns results from multiple authors
-        return nominationRepo.findByCarePlanIdAndResourceId(carePlanId, resourceId);
-    }
-
-    @RequestMapping(value = "/{carePlanId}/authors/{authorId}/resources/{resourceId}", method = RequestMethod.GET)
-    Nomination getNomination(
-            @PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceId) {
-
-        Nomination nomination = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceId(
-                carePlanId, authorId, resourceId);
+    @RequestMapping(value = "nominations/author-id/{authorId}/resource-id/{resourceId}", method = RequestMethod.GET)
+    Nomination getNominationForAuthorIdAndResourceId(@PathVariable String authorId, @PathVariable String resourceId) {
+        // each author can only have one nomination for a care plan, so the carePlanId is not needed
+        Nomination nomination = nominationRepo.findByAuthorIdAndResourceId(authorId, resourceId);
         if (nomination == null) {
             throw new ItemNotFoundException();
         } else {
@@ -108,12 +102,22 @@ class ChangeRequestController {
         }
     }
 
-    @RequestMapping(value = "/{carePlanId}/authors/{authorId}/resources/{resourceId}", method = RequestMethod.DELETE)
-    void deleteNomination(
-            @PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceId) {
+    @RequestMapping(value = "nominations", method = RequestMethod.PUT)
+    ResponseEntity<?> createNomination(@RequestBody Nomination input) {
+        Nomination existing = nominationRepo.findByAuthorIdAndResourceId(input.getAuthorId(), input.getResourceId());
+        HttpStatus code = HttpStatus.CREATED; // 201
+        if (existing != null) {
+            code = HttpStatus.OK; // 200 (updated)
+        }
+        nominationRepo.save(input);
 
-        Nomination nomination = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceId(
-                carePlanId, authorId, resourceId);
+        return new ResponseEntity<>(null, null, code);
+    }
+
+    @RequestMapping(value = "nominations/author-id/{authorId}/resource-id/{resourceId}", method = RequestMethod.DELETE)
+    void deleteNomination(@PathVariable String authorId, @PathVariable String resourceId) {
+        // each author can only have one nomination, so the carePlanId is not needed
+        Nomination nomination = nominationRepo.findByAuthorIdAndResourceId(authorId, resourceId);
 
         if (nomination != null) {
             nominationRepo.delete(nomination);
@@ -122,7 +126,7 @@ class ChangeRequestController {
         }
     }
 
-    @RequestMapping(value = "/all/authors/all/resources/{resourceId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "nominations/resource-id/{resourceId}", method = RequestMethod.DELETE)
     void deleteAllNominationsForResource(@PathVariable String resourceId) {
 
         List<Nomination> nominations = nominationRepo.findByResourceId(resourceId);
@@ -159,24 +163,6 @@ class ChangeRequestController {
 
 //        return new ChangeRequest(carePlanId, authorId, newest.getTimestamp(), conditions, goals, procedureRequests, nutritionOrders, medOrders);
         return new ChangeRequest(carePlanId, authorId, newest.getTimestamp(), goals, procedureRequests, nutritionOrders);
-    }
-
-    private String singularize(String resourceType) {
-        String value;
-        if (resourceType.endsWith("s")) {
-            value = resourceType.substring(0, resourceType.length() - 1);
-        } else {
-            value = resourceType;
-        }
-
-        // validate the resource type
-//        if (!RES_PROBLEM.equals(value) && !RES_GOAL.equals(value) && !RES_INTERVENTION.equals(value)
-//                && !RES_NUTRITION.equals(value) && !RES_MEDICATION.equals(value)) {
-        if (!RES_GOAL.equals(value) && !RES_INTERVENTION.equals(value) && !RES_NUTRITION.equals(value)) {
-            throw new ItemNotFoundException();
-        }
-
-        return value;
     }
 
 }
