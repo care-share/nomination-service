@@ -6,14 +6,20 @@ import java.io.Serializable;
 // See http://docs.oracle.com/javaee/5/tutorial/doc/bnbqa.html#bnbqg
 // See http://www.objectdb.com/java/jpa/entity/id#Composite_Primary_Key_
 public final class NominationKey implements Serializable {
+    private Long id; // generated ID of this specific nomination
     public String authorId; // CareAuth User ID of the person who authored this nomination
     public String resourceId;
 
     public NominationKey() {}
 
-    public NominationKey(String authorId, String resourceId) {
+    public NominationKey(Long id, String authorId, String resourceId) {
+        this.id = id;
         this.authorId = authorId;
         this.resourceId = resourceId;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getAuthorId() {
@@ -32,7 +38,8 @@ public final class NominationKey implements Serializable {
             return false;
         }
         NominationKey other = (NominationKey) otherOb;
-        return (authorId == null ? other.authorId == null : authorId.equals(other.authorId))
+        return (id == null ? other.id == null : id.equals(other.id))
+                && (authorId == null ? other.authorId == null : authorId.equals(other.authorId))
                 && (resourceId == null ? other.resourceId == null : resourceId.equals(other.resourceId));
     }
 

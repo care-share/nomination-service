@@ -3,6 +3,7 @@ package careshare.nominationService.controller;
 import careshare.nominationService.model.ChangeRequest;
 import careshare.nominationService.model.ChangeRequestAuthor;
 import careshare.nominationService.model.Nomination;
+import careshare.nominationService.model.NominationList;
 import careshare.nominationService.repo.NominationRepo;
 
 import java.util.*;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -91,33 +93,33 @@ class ChangeRequestController {
         return nominationRepo.findByResourceId(resourceId);
     }
 
-    @RequestMapping(value = "nominations/author-id/{authorId}/resource-id/{resourceId}", method = RequestMethod.GET)
-    Nomination getNominationForAuthorIdAndResourceId(@PathVariable String authorId, @PathVariable String resourceId) {
-        // each author can only have one nomination for a care plan, so the carePlanId is not needed
-        Nomination nomination = nominationRepo.findByAuthorIdAndResourceId(authorId, resourceId);
-        if (nomination == null) {
-            throw new ItemNotFoundException();
-        } else {
-            return nomination;
-        }
-    }
+//    @RequestMapping(value = "nominations/author-id/{authorId}/resource-id/{resourceId}", method = RequestMethod.GET)
+//    List<Nomination> getNominationForAuthorIdAndResourceId(@PathVariable String authorId, @PathVariable String resourceId) {
+//        // each author can only have one nomination for a given resource, so the carePlanId is not needed
+//        return nominationRepo.findByAuthorIdAndResourceId(authorId, resourceId);
+//    }
 
     @RequestMapping(value = "nominations", method = RequestMethod.PUT)
-    ResponseEntity<?> createNomination(@RequestBody Nomination input) {
-        Nomination existing = nominationRepo.findByAuthorIdAndResourceId(input.getAuthorId(), input.getResourceId());
-        HttpStatus code = HttpStatus.CREATED; // 201
-        if (existing != null) {
-            code = HttpStatus.OK; // 200 (updated)
+    ResponseEntity<?> createNomination(@RequestBody NominationList input) {
+        if (input.size() == 0) {
+            throw new MalformedRequestException();
         }
-        nominationRepo.save(input);
 
-        return new ResponseEntity<>(null, null, code);
+        // delete any existing nominations for this author/resource
+        Nomination first = input.get(0);
+        List<Nomination> existing = nominationRepo.findByAuthorIdAndResourceId(first.getAuthorId(), first.getResourceId());
+        existing.forEach(nominationRepo::delete);
+
+        // save the new nomination(s)
+        input.forEach(nominationRepo::save);
+
+        return new ResponseEntity<>(null, null, HttpStatus.CREATED); // 201
     }
 
-    @RequestMapping(value = "nominations/author-id/{authorId}/resource-id/{resourceId}", method = RequestMethod.DELETE)
-    void deleteNomination(@PathVariable String authorId, @PathVariable String resourceId) {
+    @RequestMapping(value = "nominations/id/{id}", method = RequestMethod.DELETE)
+    void deleteNomination(@PathVariable Long id) {
         // each author can only have one nomination, so the carePlanId is not needed
-        Nomination nomination = nominationRepo.findByAuthorIdAndResourceId(authorId, resourceId);
+        Nomination nomination = nominationRepo.findById(id);
 
         if (nomination != null) {
             nominationRepo.delete(nomination);

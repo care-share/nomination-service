@@ -18,5 +18,7 @@ public interface NominationRepo extends JpaRepository<Nomination, Long> {
 
     List<Nomination> findByCarePlanIdAndAuthorIdAndResourceType(String carePlanId, String authorId, String resourceType);
 
-    Nomination findByAuthorIdAndResourceId(String authorId, String resourceId);
+    List<Nomination> findByAuthorIdAndResourceId(String authorId, String resourceId);
+
+    Nomination findById(Long id);
 }
