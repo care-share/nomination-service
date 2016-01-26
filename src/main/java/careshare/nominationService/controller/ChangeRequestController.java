@@ -93,11 +93,10 @@ class ChangeRequestController {
         return nominationRepo.findByResourceId(resourceId);
     }
 
-//    @RequestMapping(value = "nominations/author-id/{authorId}/resource-id/{resourceId}", method = RequestMethod.GET)
-//    List<Nomination> getNominationForAuthorIdAndResourceId(@PathVariable String authorId, @PathVariable String resourceId) {
-//        // each author can only have one nomination for a given resource, so the carePlanId is not needed
-//        return nominationRepo.findByAuthorIdAndResourceId(authorId, resourceId);
-//    }
+    @RequestMapping(value = "nominations/author-id/{authorId}/resource-id/{resourceId}", method = RequestMethod.GET)
+    List<Nomination> getNominationForAuthorIdAndResourceId(@PathVariable String authorId, @PathVariable String resourceId) {
+        return nominationRepo.findByAuthorIdAndResourceId(authorId, resourceId);
+    }
 
     @RequestMapping(value = "nominations", method = RequestMethod.PUT)
     ResponseEntity<?> createNomination(@RequestBody NominationList input) {
