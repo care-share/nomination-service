@@ -18,6 +18,7 @@ public class NominationDeserializer extends JsonDeserializer<NominationList> {
     String authorId;
     String resourceId;
     String carePlanId;
+    String patientId;
     String resourceType;
     String action;
     String proposed;
@@ -30,6 +31,7 @@ public class NominationDeserializer extends JsonDeserializer<NominationList> {
         authorId = node.get("authorId").asText();
         resourceId = node.get("resourceId").asText();
         carePlanId = node.get("carePlanId").asText();
+        patientId = node.get("patientId").asText();
         resourceType = node.get("resourceType").asText();
         action = node.get("action").asText();
         JsonNode proposedJson = node.get("proposed");
@@ -76,7 +78,7 @@ public class NominationDeserializer extends JsonDeserializer<NominationList> {
     }
 
     private void generateNomination(String diff) {
-        Nomination nomination = new Nomination(authorId, resourceId, carePlanId, action, resourceType, existing, proposed, diff);
+        Nomination nomination = new Nomination(authorId, resourceId, carePlanId, patientId, action, resourceType, existing, proposed, diff);
         value.add(nomination);
     }
 }

@@ -22,6 +22,7 @@ public class Nomination implements Serializable {
     private String resourceId; // ID of the FHIR Resource that the author has nominated a change for
 
     private String carePlanId; // ID of the FHIR CarePlan that this nomination applies to
+    private String patientId; // ID of the FHIR Patient that this nomination applies to
     private Date timestamp; // when this Nomination was last updated
     private String action;
 
@@ -66,6 +67,14 @@ public class Nomination implements Serializable {
 
     public void setCarePlanId(String carePlanId) {
         this.carePlanId = carePlanId;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
     }
 
     public void setResourceId(String resourceId) {
@@ -120,10 +129,12 @@ public class Nomination implements Serializable {
         this.resourceType = resourceType;
     }
 
-    public Nomination(String authorId, String resourceId, String carePlanId, String action, String resourceType, String existing, String proposed, String diff) {
+    public Nomination(String authorId, String resourceId, String carePlanId, String patientId, String action,
+                      String resourceType, String existing, String proposed, String diff) {
         this.authorId = authorId;
         this.resourceId = resourceId;
         this.carePlanId = carePlanId;
+        this.patientId = patientId;
         this.timestamp = new Date(); // set timestamp to whenever this nomination was first created
         this.action = action;
         this.resourceType = resourceType;
