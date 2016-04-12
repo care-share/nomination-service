@@ -101,23 +101,13 @@ class ChangeRequestController {
     // returns 'true' if there are any nominations for the given patient
     @RequestMapping(value = "nominations/patient-ids/{patientIds}", method = RequestMethod.GET)
     Map<String, Boolean> getNominationsForPatientId(@PathVariable String[] patientIds) {
-        HashMap<String, Boolean> map = new HashMap<>();
-        for (String patientId : patientIds) {
-            boolean value = nominationRepo.findByPatientId(patientId).size() > 0;
-            map.put(patientId, value);
-        }
-        return map;
+        return getPatientChangeMap(patientIds, null);
     }
 
     // returns 'true' if there are any nominations for the given patient and author
     @RequestMapping(value = "nominations/author-id/{authorId}/patient-ids/{patientIds}", method = RequestMethod.GET)
     Map<String, Boolean> getNominationForAuthorIdAndPatientId(@PathVariable String authorId, @PathVariable String[] patientIds) {
-        HashMap<String, Boolean> map = new HashMap<>();
-        for (String patientId : patientIds) {
-            boolean value = nominationRepo.findByAuthorIdAndPatientId(authorId, patientId).size() > 0;
-            map.put(patientId, value);
-        }
-        return map;
+        return getPatientChangeMap(patientIds, authorId);
     }
 
     @RequestMapping(value = "nominations", method = RequestMethod.PUT)
@@ -198,6 +188,23 @@ class ChangeRequestController {
         return new ChangeRequest(carePlanId, authorId, newest.getTimestamp(), goals, procedureRequests, nutritionOrders);
     }
 
+    private Map<String, Boolean> getPatientChangeMap(String[] patientIds, String authorId) {
+        HashMap<String, Boolean> map = new HashMap<>();
+        for (String patientId : patientIds) {
+            List<Nomination> nominations;
+            if (authorId != null) {
+                nominations = nominationRepo.findByAuthorIdAndPatientId(authorId, patientId);
+            } else {
+                nominations = nominationRepo.findByPatientId(patientId);
+            }
+            boolean found = nominations.size() > 0;
+            map.put(patientId, found);
+            for (Nomination nomination : nominations) {
+                map.put(nomination.getCarePlanId(), true);
+            }
+        }
+        return map;
+    }
 }
 
 class ItemNotFoundException extends RuntimeException {
