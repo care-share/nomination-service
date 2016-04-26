@@ -22,7 +22,11 @@ public interface NominationRepo extends JpaRepository<Nomination, Long> {
 
     List<Nomination> findByPatientId(String patientId);
 
-    List<Nomination> findByAuthorIdAndPatientId(String authorId, String patientId);
+    List<Nomination> findByPatientIdAndAuthorId(String patientId, String authorId);
+
+    List<Nomination> findByPatientIdAndResourceType(String patientId, String resourceType);
+
+    List<Nomination> findByPatientIdAndAuthorIdAndResourceType(String patientId, String authorId, String resourceType);
 
     Nomination findById(Long id);
 }

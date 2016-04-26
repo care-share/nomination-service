@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -85,6 +84,20 @@ class ChangeRequestController {
             @PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType) {
         // for a single author of nominations that refer to this CarePlan, filter by resource type
         return nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, resourceType);
+    }
+
+    @RequestMapping(value = "nominations/patient-id/{patientId}/resource-type/{resourceType}", method = RequestMethod.GET)
+    List<Nomination> getNominationsForPatientIdAndResourceType(
+            @PathVariable String patientId, @PathVariable String resourceType) {
+        // for a single author of nominations that refer to this Patient, filter by resource type
+        return nominationRepo.findByPatientIdAndResourceType(patientId, resourceType);
+    }
+
+    @RequestMapping(value = "nominations/patient-id/{patientId}/author-id/{authorId}/resource-type/{resourceType}", method = RequestMethod.GET)
+    List<Nomination> getNominationsForPatientIdAndAuthorIdAndResourceType(
+            @PathVariable String patientId, @PathVariable String authorId, @PathVariable String resourceType) {
+        // for a single author of nominations that refer to this Patient, filter by resource type
+        return nominationRepo.findByPatientIdAndAuthorIdAndResourceType(patientId, authorId, resourceType);
     }
 
     @RequestMapping(value = "nominations/resource-id/{resourceId}", method = RequestMethod.GET)
@@ -193,7 +206,7 @@ class ChangeRequestController {
         for (String patientId : patientIds) {
             List<Nomination> nominations;
             if (authorId != null) {
-                nominations = nominationRepo.findByAuthorIdAndPatientId(authorId, patientId);
+                nominations = nominationRepo.findByPatientIdAndAuthorId(patientId, authorId);
             } else {
                 nominations = nominationRepo.findByPatientId(patientId);
             }
