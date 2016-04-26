@@ -31,7 +31,7 @@ class ChangeRequestController {
 
     private final NominationRepo nominationRepo;
 
-//    private static final String RES_PROBLEM = "condition";
+    private static final String RES_PROBLEM = "condition";
     private static final String RES_GOAL = "goal";
     private static final String RES_INTERVENTION = "procedure-request";
     private static final String RES_NUTRITION = "nutrition-order";
@@ -168,7 +168,7 @@ class ChangeRequestController {
     }
 
     private ChangeRequest findChangeRequest(String carePlanId, String authorId) {
-//        List<Nomination> conditions = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, RES_PROBLEM);
+        List<Nomination> conditions = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, RES_PROBLEM);
         List<Nomination> goals = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, RES_GOAL);
         List<Nomination> procedureRequests = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, RES_INTERVENTION);
         List<Nomination> nutritionOrders = nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, RES_NUTRITION);
@@ -185,7 +185,7 @@ class ChangeRequestController {
         Nomination newest = Collections.max(all, Nomination.TimestampComparator);
 
 //        return new ChangeRequest(carePlanId, authorId, newest.getTimestamp(), conditions, goals, procedureRequests, nutritionOrders, medOrders);
-        return new ChangeRequest(carePlanId, authorId, newest.getTimestamp(), goals, procedureRequests, nutritionOrders);
+        return new ChangeRequest(carePlanId, authorId, newest.getTimestamp(), conditions, goals, procedureRequests, nutritionOrders);
     }
 
     private Map<String, Boolean> getPatientChangeMap(String[] patientIds, String authorId) {

@@ -8,7 +8,7 @@ public class ChangeRequest {
     private String carePlanId;
     private String authorId;
     private Date timestamp;
-//    private List<Nomination> conditions;
+    private List<Nomination> conditions;
     private List<Nomination> goals;
     private List<Nomination> procedureRequests;
     private List<Nomination> nutritionOrders;
@@ -25,7 +25,7 @@ public class ChangeRequest {
             String carePlanId
             , String authorId
             , Date timestamp
-//            , List<Nomination> conditions
+            , List<Nomination> conditions
             , List<Nomination> goals
             , List<Nomination> procedureRequests
             , List<Nomination> nutritionOrders
@@ -34,7 +34,7 @@ public class ChangeRequest {
         this.carePlanId = carePlanId;
         this.authorId = authorId;
         this.timestamp = timestamp; // when the newest Nomination of this ChangeRequest was updated
-//        this.conditions = conditions;
+        this.conditions = conditions;
         this.goals = goals;
         this.procedureRequests = procedureRequests;
         this.nutritionOrders = nutritionOrders;
@@ -65,13 +65,13 @@ public class ChangeRequest {
         this.timestamp = timestamp;
     }
 
-//    public List<Nomination> getConditions() {
-//        return conditions;
-//    }
-//
-//    public void setConditions(List<Nomination> conditions) {
-//        this.conditions = conditions;
-//    }
+    public List<Nomination> getConditions() {
+        return conditions;
+    }
+
+    public void setConditions(List<Nomination> conditions) {
+        this.conditions = conditions;
+    }
 
     public List<Nomination> getGoals() {
         return goals;
