@@ -2,3 +2,5 @@ nomination-service:
   build: .
   ports:
     - "7293:7293"
+  volumes:
+    - ./db:/usr/src/db
