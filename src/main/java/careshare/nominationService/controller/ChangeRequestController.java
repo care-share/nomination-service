@@ -44,7 +44,7 @@ class ChangeRequestController {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // CHANGE REQUESTS
 
-    @RequestMapping(value = "change-requests/care-plan-id/{carePlanId}", method = RequestMethod.GET)
+    @RequestMapping(value = "change-requests/care-plan-id/{carePlanId:.*}", method = RequestMethod.GET)
     List<ChangeRequest> getChangeRequestList(@PathVariable String carePlanId) {
         List<ChangeRequest> changeRequests = new ArrayList<>();
 
@@ -57,7 +57,7 @@ class ChangeRequestController {
         return changeRequests;
     }
 
-    @RequestMapping(value = "change-requests/care-plan-id/{carePlanId}/author-id/{authorId}", method = RequestMethod.GET)
+    @RequestMapping(value = "change-requests/care-plan-id/{carePlanId}/author-id/{authorId:.*}", method = RequestMethod.GET)
     ChangeRequest getChangeRequest(@PathVariable String carePlanId, @PathVariable String authorId) {
         return findChangeRequest(carePlanId, authorId);
     }
@@ -65,7 +65,7 @@ class ChangeRequestController {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // AUTHORS
 
-    @RequestMapping(value = "authors/care-plan-id/{carePlanId}", method = RequestMethod.GET)
+    @RequestMapping(value = "authors/care-plan-id/{carePlanId:.*}", method = RequestMethod.GET)
     List<ChangeRequestAuthor> getChangeRequestAuthorList(@PathVariable String carePlanId) {
         return findChangeRequestAuthors(carePlanId);
     }
@@ -73,52 +73,52 @@ class ChangeRequestController {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // NOMINATIONS
 
-    @RequestMapping(value = "nominations/care-plan-id/{carePlanId}/resource-type/{resourceType}", method = RequestMethod.GET)
+    @RequestMapping(value = "nominations/care-plan-id/{carePlanId}/resource-type/{resourceType:.*}", method = RequestMethod.GET)
     List<Nomination> getNominationsForCarePlanIdAndResourceType(@PathVariable String carePlanId, @PathVariable String resourceType) {
         // for all authors of nominations that refer to this CarePlan, filter by resource type
         return nominationRepo.findByCarePlanIdAndResourceType(carePlanId, resourceType);
     }
 
-    @RequestMapping(value = "nominations/care-plan-id/{carePlanId}/author-id/{authorId}/resource-type/{resourceType}", method = RequestMethod.GET)
+    @RequestMapping(value = "nominations/care-plan-id/{carePlanId}/author-id/{authorId}/resource-type/{resourceType:.*}", method = RequestMethod.GET)
     List<Nomination> getNominationsForCarePlanIdAndAuthorIdAndResourceType(
             @PathVariable String carePlanId, @PathVariable String authorId, @PathVariable String resourceType) {
         // for a single author of nominations that refer to this CarePlan, filter by resource type
         return nominationRepo.findByCarePlanIdAndAuthorIdAndResourceType(carePlanId, authorId, resourceType);
     }
 
-    @RequestMapping(value = "nominations/patient-id/{patientId}/resource-type/{resourceType}", method = RequestMethod.GET)
+    @RequestMapping(value = "nominations/patient-id/{patientId}/resource-type/{resourceType:.*}", method = RequestMethod.GET)
     List<Nomination> getNominationsForPatientIdAndResourceType(
             @PathVariable String patientId, @PathVariable String resourceType) {
         // for a single author of nominations that refer to this Patient, filter by resource type
         return nominationRepo.findByPatientIdAndResourceType(patientId, resourceType);
     }
 
-    @RequestMapping(value = "nominations/patient-id/{patientId}/author-id/{authorId}/resource-type/{resourceType}", method = RequestMethod.GET)
+    @RequestMapping(value = "nominations/patient-id/{patientId}/author-id/{authorId}/resource-type/{resourceType:.*}", method = RequestMethod.GET)
     List<Nomination> getNominationsForPatientIdAndAuthorIdAndResourceType(
             @PathVariable String patientId, @PathVariable String authorId, @PathVariable String resourceType) {
         // for a single author of nominations that refer to this Patient, filter by resource type
         return nominationRepo.findByPatientIdAndAuthorIdAndResourceType(patientId, authorId, resourceType);
     }
 
-    @RequestMapping(value = "nominations/resource-id/{resourceId}", method = RequestMethod.GET)
+    @RequestMapping(value = "nominations/resource-id/{resourceId:.*}", method = RequestMethod.GET)
     List<Nomination> getNominationsForResourceId(@PathVariable String resourceId) {
         // for all authors of nominations that refer to this Resource
         return nominationRepo.findByResourceId(resourceId);
     }
 
-    @RequestMapping(value = "nominations/author-id/{authorId}/resource-id/{resourceId}", method = RequestMethod.GET)
+    @RequestMapping(value = "nominations/author-id/{authorId}/resource-id/{resourceId:.*}", method = RequestMethod.GET)
     List<Nomination> getNominationForAuthorIdAndResourceId(@PathVariable String authorId, @PathVariable String resourceId) {
         return nominationRepo.findByAuthorIdAndResourceId(authorId, resourceId);
     }
 
     // returns 'true' if there are any nominations for the given patient
-    @RequestMapping(value = "nominations/patient-ids/{patientIds}", method = RequestMethod.GET)
+    @RequestMapping(value = "nominations/patient-ids/{patientIds:.*}", method = RequestMethod.GET)
     Map<String, Boolean> getNominationsForPatientId(@PathVariable String[] patientIds) {
         return getPatientChangeMap(patientIds, null);
     }
 
     // returns 'true' if there are any nominations for the given patient and author
-    @RequestMapping(value = "nominations/author-id/{authorId}/patient-ids/{patientIds}", method = RequestMethod.GET)
+    @RequestMapping(value = "nominations/author-id/{authorId}/patient-ids/{patientIds:.*}", method = RequestMethod.GET)
     Map<String, Boolean> getNominationForAuthorIdAndPatientId(@PathVariable String authorId, @PathVariable String[] patientIds) {
         return getPatientChangeMap(patientIds, authorId);
     }
@@ -140,7 +140,7 @@ class ChangeRequestController {
         return new ResponseEntity<>(null, null, HttpStatus.CREATED); // 201
     }
 
-    @RequestMapping(value = "nominations/id/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "nominations/id/{id:.*}", method = RequestMethod.DELETE)
     void deleteNomination(@PathVariable Long id) {
         // each author can only have one nomination, so the carePlanId is not needed
         Nomination nomination = nominationRepo.findById(id);
@@ -152,7 +152,7 @@ class ChangeRequestController {
         }
     }
 
-    @RequestMapping(value = "nominations/resource-id/{resourceId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "nominations/resource-id/{resourceId:.*}", method = RequestMethod.DELETE)
     void deleteAllNominationsForResource(@PathVariable String resourceId) {
 
         List<Nomination> nominations = nominationRepo.findByResourceId(resourceId);
@@ -162,7 +162,7 @@ class ChangeRequestController {
         // should we return 404 if no nominations exist?
     }
 
-    @RequestMapping(value = "nominations/author-id/{authorId}/resource-id/{resourceId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "nominations/author-id/{authorId}/resource-id/{resourceId:.*}", method = RequestMethod.DELETE)
     void deleteAllNominationsForAuthorAndResource(@PathVariable String authorId, @PathVariable String resourceId) {
 
         List<Nomination> nominations = nominationRepo.findByAuthorIdAndResourceId(authorId, resourceId);
