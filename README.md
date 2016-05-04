@@ -58,6 +58,7 @@ To apply the backups:
 * `GET /change-requests/care-plan-id/:carePlanId`
   * Gets all Change Requests associated with a given CarePlan
   * Returns JSON body:
+
     ```
     [ { carePlanId: string,
         authorId: string,
@@ -68,21 +69,27 @@ To apply the backups:
         nutritionOrders: [ nomination ]
     } ]
     ```
+
     The `nomination` objects are described further down in this README.
+
 * `GET /change-requests/care-plan-id/:carePlanId/author-id/:authorId`
   * Gets all Change Requests associated with a given CarePlan, filtered to a given Author
+
 * `GET /authors/care-plan-id/:carePlanId
   * Gets a list of Authors who have submitted nominations for a given CarePlan
   * Returns JSON body:
+
     ```
     [ { authorId: string,
         timestamp: date
     } ]
     ```
+
 * `GET /nominations/care-plan-id/:carePlanId/resource-type/:resourceType`
   * Gets a list of Nominations for a given CarePlan, filtered to a given resource type
   * Valid resource types are: `condition` | `goal` | `procedure-request` | `nutrition-order`
   * Returns JSON body:
+
     ```
     [ { id: long,
         carePlanId: string,
@@ -102,30 +109,42 @@ To apply the backups:
         }
     } ]
     ```
+
     The `fhirResource` objects are described at the [FHIR documentation pages](https://www.hl7.org/fhir/resourcelist.html).
+
 * `GET /nominations/care-plan-id/:carePlanId/author-id/:authorId/resource-type/:resourceType`
   * Gets a list of Nominations for a given CarePlan, filtered to a given Author and resource type
+
 * `GET /nominations/patient-id/:patientId/resource-type/:resourceType`
   * Gets a list of Nominations for a given Patient, filtered to a given resource type
+
 * `GET /nominations/patient-id/:patientId/author-id/:authorId/resource-type/:resourceType`
   * Gets a list of Nominations for a given Patient, filtered to a given Author and resource type
+
 * `GET /nominations/resource-id/:resourceId`
   * Gets a list of Nominations for a given Patient, filtered to a given Resource
+
 * `GET /nominations/author-id/:authorId/resource-id/:resourceId`
   * Gets a list of Nominations for a given Patient, filtered to a given Author and Resource
+
 * `GET /nominations/patient-ids/:patientIds`
   * Gets a map of whether or not any Nominations exist for a given list of Patients (comma-separated ID values)
   * For example, with a request of "`GET /nominations/patient-ids/foo,bar`", returns JSON body:
+
     ```
     { foo: true,
       bar: false
     }
     ```
+
     The keys in the map represent  Patient IDs, and the values represent whether or not any nominations were found for that particular Patient.
+
 * `GET /nominations/author-id/:authorId/patient-ids/:patientIds`
   * Gets a list of Nominations for one or more given Patients (comma-separated), filtered to a given
+
 * `PUT /nominations`
   * Creates a new Nomination from the JSON body of the request:
+
     ```
     { carePlanId: string,
       authorId: string',
@@ -138,10 +157,14 @@ To apply the backups:
       proposed: fhirResource
     }
     ```
+
   * **Note: this will overwrite any exisiting Nominations with the same `authorId` and `resourceId`!** Effectively, one Author may only have one outstanding Nomination for a given Resource (though that Nomination may include multiple changes to various attributes of that Resource).
+
 * `DELETE /nominations/id/:id`
   * Deletes a given Nomination
+
 * `DELETE /nominations/resource-id/:resourceId`
   * Deletes all Nominations for a given Resource
+
 * `DELETE /nominations/author-id/:authorId/resource-id/:resourceId`
   * Deletes all Nominations for a given Author and Resource
