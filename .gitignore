@@ -4,3 +4,7 @@
 
 # generated files
 target/
+
+# database files
+/db/*
+!/db/backup/
