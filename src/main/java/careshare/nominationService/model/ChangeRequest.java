@@ -7,6 +7,7 @@ public class ChangeRequest {
 
     private String carePlanId;
     private String authorId;
+    private String patientId;
     private Date timestamp;
     private List<Nomination> conditions;
     private List<Nomination> goals;
@@ -17,28 +18,18 @@ public class ChangeRequest {
     public ChangeRequest() {
     }
 
-    public ChangeRequest(String carePlanId) {
-        this.carePlanId = carePlanId;
-    }
-
     public ChangeRequest(
-            String carePlanId
-            , String authorId
-            , Date timestamp
-            , List<Nomination> conditions
-            , List<Nomination> goals
-            , List<Nomination> procedureRequests
-            , List<Nomination> nutritionOrders
-//            , List<Nomination> medicationOrders
+            String carePlanId, String authorId, String patientId, Date timestamp, List<Nomination> conditions,
+            List<Nomination> goals, List<Nomination> procedureRequests, List<Nomination> nutritionOrders
     ) {
         this.carePlanId = carePlanId;
         this.authorId = authorId;
-        this.timestamp = timestamp; // when the newest Nomination of this ChangeRequest was updated
+        this.patientId = patientId;
+        this.timestamp = timestamp;
         this.conditions = conditions;
         this.goals = goals;
         this.procedureRequests = procedureRequests;
         this.nutritionOrders = nutritionOrders;
-//        this.medicationOrders = medicationOrders;
     }
 
     public String getCarePlanId() {
@@ -55,6 +46,14 @@ public class ChangeRequest {
 
     public void setAuthorId(String authorId) {
         this.authorId = authorId;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
     }
 
     public Date getTimestamp() {

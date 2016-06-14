@@ -44,17 +44,22 @@ class ChangeRequestController {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // CHANGE REQUESTS
 
-    @RequestMapping(value = "change-requests/care-plan-id/{carePlanId:.*}", method = RequestMethod.GET)
-    List<ChangeRequest> getChangeRequestList(@PathVariable String carePlanId) {
+    @RequestMapping(value = "change-requests/patient-id/{patientId:.*}", method = RequestMethod.GET)
+    List<ChangeRequest> getPatientChangeRequestList(@PathVariable String patientId) {
         List<ChangeRequest> changeRequests = new ArrayList<>();
 
-        List<ChangeRequestAuthor> authors = findChangeRequestAuthors(carePlanId);
-        for (ChangeRequestAuthor author : authors) {
-            ChangeRequest changeRequest = findChangeRequest(carePlanId, author.getAuthorId());
-            changeRequests.add(changeRequest);
+        List<String> carePlanIds = findChangeRequestCarePlans(patientId);
+        for (String carePlanId : carePlanIds) {
+            List<ChangeRequest> result = findChangeRequestList(carePlanId);
+            changeRequests.addAll(result);
         }
 
         return changeRequests;
+    }
+
+    @RequestMapping(value = "change-requests/care-plan-id/{carePlanId:.*}", method = RequestMethod.GET)
+    List<ChangeRequest> getCarePlanChangeRequestList(@PathVariable String carePlanId) {
+        return findChangeRequestList(carePlanId);
     }
 
     @RequestMapping(value = "change-requests/care-plan-id/{carePlanId}/author-id/{authorId:.*}", method = RequestMethod.GET)
@@ -172,12 +177,28 @@ class ChangeRequestController {
         // should we return 404 if no nominations exist?
     }
 
+    private List<String> findChangeRequestCarePlans(String patientId) {
+        return nominationRepo.findCarePlanIdsByPatientId(patientId);
+    }
+
     private List<ChangeRequestAuthor> findChangeRequestAuthors(String carePlanId) {
         List<Object[]> results = nominationRepo.findAuthorIdsByCarePlanId(carePlanId);
         List<ChangeRequestAuthor> value = new ArrayList<>();
         value.addAll(results.stream().map(result -> new ChangeRequestAuthor((String) result[0], (Date) result[1]))
                 .collect(Collectors.toList()));
         return value;
+    }
+
+    private List<ChangeRequest> findChangeRequestList(String carePlanId) {
+        List<ChangeRequest> changeRequests = new ArrayList<>();
+
+        List<ChangeRequestAuthor> authors = findChangeRequestAuthors(carePlanId);
+        for (ChangeRequestAuthor author : authors) {
+            ChangeRequest changeRequest = findChangeRequest(carePlanId, author.getAuthorId());
+            changeRequests.add(changeRequest);
+        }
+
+        return changeRequests;
     }
 
     private ChangeRequest findChangeRequest(String carePlanId, String authorId) {
@@ -198,7 +219,7 @@ class ChangeRequestController {
         Nomination newest = Collections.max(all, Nomination.TimestampComparator);
 
 //        return new ChangeRequest(carePlanId, authorId, newest.getTimestamp(), conditions, goals, procedureRequests, nutritionOrders, medOrders);
-        return new ChangeRequest(carePlanId, authorId, newest.getTimestamp(), conditions, goals, procedureRequests, nutritionOrders);
+        return new ChangeRequest(carePlanId, authorId, newest.getPatientId(), newest.getTimestamp(), conditions, goals, procedureRequests, nutritionOrders);
     }
 
     private Map<String, Boolean> getPatientChangeMap(String[] patientIds, String authorId) {
